@@ -1,10 +1,7 @@
 import 'package:collection/collection.dart' show IterableExtension;
-import 'package:country_code_picker/country_code.dart';
-import 'package:country_code_picker/country_codes.dart';
-import 'package:country_code_picker/selection_dialog.dart';
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:universal_platform/universal_platform.dart';
+import 'package:get/get_utils/src/platform/platform.dart';
 
 class CodePickerWidget extends StatefulWidget {
   final ValueChanged<CountryCode>? onChanged;
@@ -203,7 +200,7 @@ class CodePickerWidgetState extends State<CodePickerWidget> {
   }
 
   void showCountryCodePickerDialog() {
-    if (!UniversalPlatform.isAndroid && !UniversalPlatform.isIOS) {
+    if (!GetPlatform.isAndroid && !GetPlatform.isIOS) {
       showDialog(
         barrierColor: widget.barrierColor ?? Colors.grey.withOpacity(0.5),
         // backgroundColor: widget.backgroundColor ?? Colors.transparent,
@@ -245,41 +242,41 @@ class CodePickerWidgetState extends State<CodePickerWidget> {
         }
       });
     } else {
-      showMaterialModalBottomSheet(
-        barrierColor: widget.barrierColor ?? Colors.grey.withOpacity(0.5),
-        backgroundColor: widget.backgroundColor ?? Colors.transparent,
-        context: context,
-        builder: (context) => Center(
-          child: SelectionDialog(
-            elements,
-            favoriteElements,
-            showCountryOnly: widget.showCountryOnly,
-            emptySearchBuilder: widget.emptySearchBuilder,
-            searchDecoration: widget.searchDecoration,
-            searchStyle: widget.searchStyle,
-            textStyle: widget.dialogTextStyle,
-            boxDecoration: widget.boxDecoration,
-            showFlag: widget.showFlagDialog != null
-                ? widget.showFlagDialog
-                : widget.showFlag,
-            flagWidth: widget.flagWidth,
-            flagDecoration: widget.flagDecoration,
-            size: widget.dialogSize,
-            backgroundColor: widget.dialogBackgroundColor,
-            barrierColor: widget.barrierColor,
-            hideSearch: widget.hideSearch,
-            closeIcon: widget.closeIcon,
-          ),
-        ),
-      ).then((e) {
-        if (e != null) {
-          setState(() {
-            selectedItem = e;
-          });
+      // showMaterialModalBottomSheet(
+      //   barrierColor: widget.barrierColor ?? Colors.grey.withOpacity(0.5),
+      //   backgroundColor: widget.backgroundColor ?? Colors.transparent,
+      //   context: context,
+      //   builder: (context) => Center(
+      //     child: SelectionDialog(
+      //       elements,
+      //       favoriteElements,
+      //       showCountryOnly: widget.showCountryOnly,
+      //       emptySearchBuilder: widget.emptySearchBuilder,
+      //       searchDecoration: widget.searchDecoration,
+      //       searchStyle: widget.searchStyle,
+      //       textStyle: widget.dialogTextStyle,
+      //       boxDecoration: widget.boxDecoration,
+      //       showFlag: widget.showFlagDialog != null
+      //           ? widget.showFlagDialog
+      //           : widget.showFlag,
+      //       flagWidth: widget.flagWidth,
+      //       flagDecoration: widget.flagDecoration,
+      //       size: widget.dialogSize,
+      //       backgroundColor: widget.dialogBackgroundColor,
+      //       barrierColor: widget.barrierColor,
+      //       hideSearch: widget.hideSearch,
+      //       closeIcon: widget.closeIcon,
+      //     ),
+      //   ),
+      // ).then((e) {
+      //   if (e != null) {
+      //     setState(() {
+      //       selectedItem = e;
+      //     });
 
-          _publishSelection(e);
-        }
-      });
+      //     _publishSelection(e);
+      //   }
+      // });
     }
   }
 

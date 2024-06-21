@@ -186,6 +186,7 @@ class NotificationHelper {
         AndroidNotificationDetails(
       '6ammart',
       '6ammart',
+      '6ammart',
       playSound: true,
       importance: Importance.max,
       priority: Priority.max,
@@ -212,6 +213,7 @@ class NotificationHelper {
     );
     AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
+      '6ammart',
       '6ammart',
       '6ammart',
       importance: Importance.max,
@@ -248,6 +250,7 @@ class NotificationHelper {
     );
     final AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
+      '6ammart',
       '6ammart',
       '6ammart',
       largeIcon: FilePathAndroidBitmap(largeIconPath),

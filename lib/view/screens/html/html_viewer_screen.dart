@@ -44,8 +44,8 @@ class _HtmlViewerScreenState extends State<HtmlViewerScreen> {
                     key: Key(widget.isPrivacyPolicy
                         ? 'privacy_policy'
                         : 'terms_condition'),
-                    onLinkTap: (String? url, RenderContext context,
-                        Map<String, String> attributes, element) {
+                    onLinkTap:
+                        (String? url, Map<String, String> attributes, element) {
                       if ((url ?? '').startsWith('www.')) {
                         url = 'https://' + url!;
                       }

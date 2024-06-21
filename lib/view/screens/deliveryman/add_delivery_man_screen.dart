@@ -1,4 +1,4 @@
-import 'package:country_code_picker/country_code.dart';
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sixam_mart_store/controller/auth_controller.dart';
 import 'package:sixam_mart_store/controller/delivery_man_controller.dart';
