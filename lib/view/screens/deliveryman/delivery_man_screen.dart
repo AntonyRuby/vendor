@@ -53,7 +53,7 @@ class DeliveryManScreen extends StatelessWidget {
                               child: ClipOval(
                                   child: CustomImage(
                                 image:
-                                    '${Get.find<SplashController>().configModel.baseUrls.deliveryManImageUrl}/${_deliveryMan.image ?? ''}',
+                                    '${Get.find<SplashController>().configModel.baseUrls?.deliveryManImageUrl}/${_deliveryMan.image ?? ''}',
                                 height: 50,
                                 width: 50,
                                 fit: BoxFit.cover,
@@ -83,7 +83,8 @@ class DeliveryManScreen extends StatelessWidget {
                                           .tr,
                                   onYesPressed: () =>
                                       Get.find<DeliveryManController>()
-                                          .deleteDeliveryMan(_deliveryMan.id),
+                                          .deleteDeliveryMan(
+                                              _deliveryMan.id ?? 0),
                                 ));
                               },
                               icon:

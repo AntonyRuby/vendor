@@ -24,7 +24,7 @@ class MenuButton extends StatelessWidget {
 
     return InkWell(
       onTap: () {
-        if (menu.isBlocked) {
+        if (menu.isBlocked ?? false) {
           showCustomSnackBar('this_feature_is_blocked_by_admin'.tr);
         } else {
           if (isLogout) {
@@ -45,7 +45,7 @@ class MenuButton extends StatelessWidget {
               Get.toNamed(RouteHelper.getSignInRoute());
             }
           } else {
-            Get.offNamed(menu.route);
+            Get.offNamed(menu.route ?? '');
           }
         }
       },
@@ -64,7 +64,7 @@ class MenuButton extends StatelessWidget {
                 : Theme.of(context).primaryColor,
             boxShadow: [
               BoxShadow(
-                  color: Colors.grey[Get.isDarkMode ? 800 : 200],
+                  color: Colors.grey[Get.isDarkMode ? 800 : 200] ?? Colors.red,
                   spreadRadius: 1,
                   blurRadius: 5)
             ],
@@ -72,11 +72,11 @@ class MenuButton extends StatelessWidget {
           alignment: Alignment.center,
           child: isProfile
               ? ProfileImageWidget(size: _size)
-              : Image.asset(menu.icon,
+              : Image.asset(menu.icon ?? '',
                   width: _size, height: _size, color: Colors.white),
         ),
         SizedBox(height: Dimensions.PADDING_SIZE_EXTRA_SMALL),
-        Text(menu.title,
+        Text(menu.title ?? '',
             style: robotoMedium.copyWith(fontSize: Dimensions.FONT_SIZE_SMALL),
             textAlign: TextAlign.center),
       ]),
@@ -98,8 +98,8 @@ class ProfileImageWidget extends StatelessWidget {
         child: ClipOval(
           child: CustomImage(
             image:
-                '${Get.find<SplashController>().configModel.baseUrls.vendorImageUrl}'
-                '/${(authController.profileModel != null && Get.find<AuthController>().isLoggedIn()) ? authController.profileModel.image ?? '' : ''}',
+                '${Get.find<SplashController>().configModel.baseUrls?.vendorImageUrl}'
+                '/${(Get.find<AuthController>().isLoggedIn()) ? authController.profileModel.image ?? '' : ''}',
             width: size,
             height: size,
             fit: BoxFit.cover,

@@ -208,7 +208,7 @@ class StoreController extends GetxController implements GetxService {
     update();
   }
 
-  Future<void> getCategoryList(Item item) async {
+  Future<void> getCategoryList(Item? item) async {
     _categoryList = [];
     _categoryIndex = 0;
     Response response = await storeRepo.getCategoryList();
@@ -217,18 +217,18 @@ class StoreController extends GetxController implements GetxService {
       for (int index = 0; index < response.body.length; index++) {
         _categoryList.add(CategoryModel.fromJson(response.body[index]));
         if (CategoryModel.fromJson(response.body[index]).id.toString() ==
-            item.categoryIds?[0].id) {
+            item?.categoryIds?[0].id) {
           _categoryIndex = index + 1;
         }
       }
-      await getSubCategoryList(int.parse(item.categoryIds?[0].id ?? ''), item);
+      await getSubCategoryList(int.parse(item?.categoryIds?[0].id ?? ''), item);
     } else {
       ApiChecker.checkApi(response);
     }
     update();
   }
 
-  Future<void> getSubCategoryList(int categoryID, Item item) async {
+  Future<void> getSubCategoryList(int categoryID, Item? item) async {
     _subCategoryList = [];
     if (categoryID != 0) {
       _subCategoryIndex = 0;
@@ -237,9 +237,9 @@ class StoreController extends GetxController implements GetxService {
         _subCategoryList = [];
         for (int index = 0; index < response.body.length; index++) {
           _subCategoryList.add(CategoryModel.fromJson(response.body[index]));
-          if ((item.categoryIds?.length ?? 0) > 1) {
+          if ((item?.categoryIds?.length ?? 0) > 1) {
             if (CategoryModel.fromJson(response.body[index]).id.toString() ==
-                item.categoryIds?[1].id) {
+                item?.categoryIds?[1].id) {
               _subCategoryIndex = index + 1;
             }
           }

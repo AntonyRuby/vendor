@@ -18,7 +18,7 @@ class ProfileCard extends StatelessWidget {
         color: Theme.of(context).cardColor,
         boxShadow: [
           BoxShadow(
-              color: Colors.grey[Get.isDarkMode ? 800 : 200],
+              color: Colors.grey[Get.isDarkMode ? 800 : 200] ?? Colors.red,
               blurRadius: 5,
               spreadRadius: 1)
         ],

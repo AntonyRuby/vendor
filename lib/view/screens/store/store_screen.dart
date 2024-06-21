@@ -22,7 +22,7 @@ class StoreScreen extends StatefulWidget {
 class _StoreScreenState extends State<StoreScreen>
     with TickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
-  TabController _tabController;
+  late TabController _tabController;
   bool _review =
       Get.find<AuthController>().profileModel.stores?.first.reviewsSection ??
           false;
@@ -236,9 +236,9 @@ class _StoreScreenState extends State<StoreScreen>
                                                       .cardColor),
                                             )
                                           : SizedBox(),
-                                      _store.discount.maxDiscount != 0
+                                      _store.discount?.maxDiscount != 0
                                           ? Text(
-                                              '[ ${'maximum_discount'.tr}: ${PriceConverter.convertPrice(_store.discount.maxDiscount)} ]',
+                                              '[ ${'maximum_discount'.tr}: ${PriceConverter.convertPrice(_store.discount?.maxDiscount)} ]',
                                               style: robotoRegular.copyWith(
                                                   fontSize: Dimensions
                                                       .FONT_SIZE_EXTRA_SMALL,
@@ -250,7 +250,8 @@ class _StoreScreenState extends State<StoreScreen>
                               )
                             : SizedBox(),
 
-                        (_store.delivery && _store.freeDelivery)
+                        ((_store.delivery ?? false) &&
+                                (_store.freeDelivery ?? false))
                             ? Text(
                                 'free_delivery'.tr,
                                 style: robotoRegular.copyWith(
@@ -293,7 +294,7 @@ class _StoreScreenState extends State<StoreScreen>
                     ),
                     SliverToBoxAdapter(
                         child: AnimatedBuilder(
-                      animation: _tabController.animation,
+                      animation: _tabController,
                       builder: (context, child) {
                         if (_tabController.index == 0) {
                           return ItemView(

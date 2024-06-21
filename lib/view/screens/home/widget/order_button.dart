@@ -52,7 +52,7 @@ class OrderButton extends StatelessWidget {
               fontSize: Dimensions.FONT_SIZE_EXTRA_SMALL,
               color: isSelected
                   ? Theme.of(context).cardColor
-                  : Theme.of(context).textTheme.bodyLarge.color,
+                  : Theme.of(context).textTheme.bodyLarge?.color,
             ),
           ),
         ),

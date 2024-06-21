@@ -30,11 +30,11 @@ class PosProductWidget extends StatelessWidget {
     int _index = 0;
     List<int> _ids = [];
     List<int> _qtys = [];
-    cart.addOnIds.forEach((addOn) {
-      _ids.add(addOn.id);
-      _qtys.add(addOn.quantity);
+    cart.addOnIds?.forEach((addOn) {
+      _ids.add(addOn.id ?? 0);
+      _qtys.add(addOn.quantity ?? 0);
     });
-    cart.item.addOns.forEach((addOn) {
+    cart.item?.addOns?.forEach((addOn) {
       if (_ids.contains(addOn.id)) {
         _addOnText = _addOnText +
             '${(_index == 0) ? '' : ',  '}${addOn.name} (${_qtys[_index]})';
@@ -43,17 +43,18 @@ class PosProductWidget extends StatelessWidget {
     });
 
     String _variationText = '';
-    if (cart.variation.length > 0) {
-      List<String> _variationTypes = cart.variation[0].type.split('-');
-      if (_variationTypes.length == cart.item.choiceOptions.length) {
+    if ((cart.variation ?? []).length > 0) {
+      List<String> _variationTypes =
+          (cart.variation?.first.type).toString().split('-');
+      if (_variationTypes.length == (cart.item?.choiceOptions ?? []).length) {
         int _index = 0;
-        cart.item.choiceOptions.forEach((choice) {
+        (cart.item?.choiceOptions ?? []).forEach((choice) {
           _variationText = _variationText +
               '${(_index == 0) ? '' : ',  '}${choice.title} - ${_variationTypes[_index]}';
           _index = _index + 1;
         });
       } else {
-        _variationText = cart.item.variations[0].type;
+        _variationText = (cart.item?.variations?.first.type).toString();
       }
     }
 
@@ -66,7 +67,7 @@ class PosProductWidget extends StatelessWidget {
             isScrollControlled: true,
             backgroundColor: Colors.transparent,
             builder: (con) => ItemBottomSheet(
-                item: cart.item, cartIndex: cartIndex, cart: cart),
+                item: cart.item ?? Item(), cartIndex: cartIndex, cart: cart),
           );
         },
         child: Container(
@@ -94,7 +95,8 @@ class PosProductWidget extends StatelessWidget {
                   borderRadius: BorderRadius.circular(Dimensions.RADIUS_SMALL),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey[Get.isDarkMode ? 800 : 200],
+                      color:
+                          Colors.grey[Get.isDarkMode ? 800 : 200] ?? Colors.red,
                       blurRadius: 5,
                       spreadRadius: 1,
                     )
@@ -110,7 +112,7 @@ class PosProductWidget extends StatelessWidget {
                                 BorderRadius.circular(Dimensions.RADIUS_SMALL),
                             child: CustomImage(
                               image:
-                                  '${Get.find<SplashController>().configModel.baseUrls.itemImageUrl}/${cart.item.image}',
+                                  '${Get.find<SplashController>().configModel.baseUrls?.itemImageUrl}/${cart.item?.image ?? ''}',
                               height: 65,
                               width: 70,
                               fit: BoxFit.cover,
@@ -146,7 +148,7 @@ class PosProductWidget extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                cart.item.name,
+                                cart.item?.name ?? '',
                                 style: robotoMedium.copyWith(
                                     fontSize: Dimensions.FONT_SIZE_SMALL),
                                 maxLines: 2,
@@ -154,13 +156,14 @@ class PosProductWidget extends StatelessWidget {
                               ),
                               SizedBox(height: 2),
                               RatingBar(
-                                  rating: cart.item.avgRating,
+                                  rating: (cart.item?.avgRating) ?? 0,
                                   size: 12,
-                                  ratingCount: cart.item.ratingCount),
+                                  ratingCount: cart.item?.ratingCount ?? 0),
                               SizedBox(height: 5),
                               Text(
                                 PriceConverter.convertPrice(
-                                    cart.discountedPrice + cart.discountAmount),
+                                    cart.discountedPrice ??
+                                        0 + (cart.discountAmount ?? 0)),
                                 style: robotoMedium.copyWith(
                                     fontSize: Dimensions.FONT_SIZE_SMALL),
                               ),
@@ -169,7 +172,7 @@ class PosProductWidget extends StatelessWidget {
                       Row(children: [
                         QuantityButton(
                           onTap: () {
-                            if (cart.quantity > 1) {
+                            if ((cart.quantity ?? 0) > 1) {
                               Get.find<PosController>()
                                   .setQuantity(false, cart);
                             } else {
@@ -221,7 +224,7 @@ class PosProductWidget extends StatelessWidget {
                             ]),
                           )
                         : SizedBox(),
-                    cart.item.variations.length > 0
+                    (cart.item?.variations ?? []).length > 0
                         ? Padding(
                             padding: EdgeInsets.only(
                                 top: Dimensions.PADDING_SIZE_EXTRA_SMALL),

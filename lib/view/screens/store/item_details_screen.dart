@@ -24,11 +24,13 @@ class ItemDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Get.find<StoreController>().setAvailability(item.status == 1);
-    if (Get.find<AuthController>().profileModel.stores[0].reviewsSection) {
-      Get.find<StoreController>().getItemReviewList(item.id);
+    if (Get.find<AuthController>().profileModel.stores?.first.reviewsSection ??
+        false) {
+      Get.find<StoreController>().getItemReviewList(item.id ?? 0);
     }
     Module _module =
-        Get.find<SplashController>().configModel.moduleConfig.module;
+        Get.find<SplashController>().configModel.moduleConfig?.module ??
+            Module();
 
     return Scaffold(
       appBar: CustomAppBar(title: 'item_details'.tr),
@@ -49,7 +51,7 @@ class ItemDetailsScreen extends StatelessWidget {
                         BorderRadius.circular(Dimensions.RADIUS_SMALL),
                     child: CustomImage(
                       image:
-                          '${Get.find<SplashController>().configModel.baseUrls.itemImageUrl}/${item.image}',
+                          '${Get.find<SplashController>().configModel.baseUrls?.itemImageUrl}/${item.image}',
                       height: 70,
                       width: 80,
                       fit: BoxFit.cover,
@@ -62,7 +64,7 @@ class ItemDetailsScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                       Text(
-                        item.name,
+                        item.name.toString(),
                         style: robotoMedium.copyWith(
                             fontSize: Dimensions.FONT_SIZE_LARGE),
                         maxLines: 1,
@@ -82,10 +84,11 @@ class ItemDetailsScreen extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: robotoRegular,
                         )),
-                        (_module.unit ||
-                                Get.find<SplashController>()
-                                    .configModel
-                                    .toggleVegNonVeg)
+                        ((_module.unit ?? false) ||
+                                (Get.find<SplashController>()
+                                        .configModel
+                                        .toggleVegNonVeg ??
+                                    false))
                             ? Container(
                                 padding: EdgeInsets.symmetric(
                                     vertical:
@@ -97,11 +100,12 @@ class ItemDetailsScreen extends StatelessWidget {
                                   color: Theme.of(context).primaryColor,
                                 ),
                                 child: Text(
-                                  _module.unit
-                                      ? item.unitType
-                                      : item.veg == 0
-                                          ? 'non_veg'.tr
-                                          : 'veg'.tr,
+                                  ((_module.unit ?? false)
+                                          ? item.unitType
+                                          : item.veg == 0
+                                              ? 'non_veg'.tr
+                                              : 'veg'.tr) ??
+                                      '',
                                   style: robotoRegular.copyWith(
                                       fontSize:
                                           Dimensions.FONT_SIZE_EXTRA_SMALL,
@@ -113,7 +117,7 @@ class ItemDetailsScreen extends StatelessWidget {
                     ])),
               ]),
               SizedBox(height: Dimensions.PADDING_SIZE_SMALL),
-              _module.itemAvailableTime
+              (_module.itemAvailableTime ?? false)
                   ? Row(children: [
                       Text('daily_time'.tr,
                           style: robotoRegular.copyWith(
@@ -121,8 +125,8 @@ class ItemDetailsScreen extends StatelessWidget {
                       SizedBox(width: Dimensions.PADDING_SIZE_EXTRA_SMALL),
                       Expanded(
                           child: Text(
-                        '${DateConverter.convertStringTimeToTime(item.availableTimeStarts)}'
-                        ' - ${DateConverter.convertStringTimeToTime(item.availableTimeEnds)}',
+                        '${DateConverter.convertStringTimeToTime(item.availableTimeStarts ?? '')}'
+                        ' - ${DateConverter.convertStringTimeToTime(item.availableTimeEnds ?? '')}',
                         maxLines: 1,
                         style: robotoMedium.copyWith(
                             color: Theme.of(context).primaryColor),
@@ -137,7 +141,7 @@ class ItemDetailsScreen extends StatelessWidget {
                         activeColor: Theme.of(context).primaryColor,
                         value: storeController.isAvailable,
                         onToggle: (bool isActive) {
-                          storeController.toggleAvailable(item.id);
+                          storeController.toggleAvailable(item.id ?? 0);
                         },
                       ),
                     ])
@@ -145,7 +149,8 @@ class ItemDetailsScreen extends StatelessWidget {
               Row(children: [
                 Icon(Icons.star,
                     color: Theme.of(context).primaryColor, size: 20),
-                Text(item.avgRating.toStringAsFixed(1), style: robotoRegular),
+                Text((item.avgRating ?? 0).toStringAsFixed(1),
+                    style: robotoRegular),
                 SizedBox(width: Dimensions.PADDING_SIZE_SMALL),
                 Expanded(
                     child: Text(
@@ -154,7 +159,7 @@ class ItemDetailsScreen extends StatelessWidget {
                       fontSize: Dimensions.FONT_SIZE_SMALL,
                       color: Theme.of(context).disabledColor),
                 )),
-                _module.itemAvailableTime
+                (_module.itemAvailableTime ?? false)
                     ? SizedBox()
                     : FlutterSwitch(
                         width: 100,
@@ -166,43 +171,43 @@ class ItemDetailsScreen extends StatelessWidget {
                         activeColor: Theme.of(context).primaryColor,
                         value: storeController.isAvailable,
                         onToggle: (bool isActive) {
-                          storeController.toggleAvailable(item.id);
+                          storeController.toggleAvailable(item.id ?? 0);
                         },
                       ),
               ]),
               SizedBox(height: Dimensions.PADDING_SIZE_LARGE),
-              item.variations.length > 0
+              (item.variations ?? []).length > 0
                   ? Text('variations'.tr, style: robotoMedium)
                   : SizedBox(),
               SizedBox(
-                  height: item.variations.length > 0
+                  height: (item.variations ?? []).length > 0
                       ? Dimensions.PADDING_SIZE_EXTRA_SMALL
                       : 0),
-              item.variations.length > 0
+              (item.variations ?? []).length > 0
                   ? ListView.builder(
-                      itemCount: item.variations.length,
+                      itemCount: (item.variations ?? []).length,
                       physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       padding: EdgeInsets.zero,
                       itemBuilder: (context, index) {
                         return Row(children: [
-                          Text(item.variations[index].type + ':',
+                          Text((item.variations?[index].type ?? '') + ':',
                               style: robotoRegular.copyWith(
                                   fontSize: Dimensions.FONT_SIZE_SMALL)),
                           SizedBox(width: Dimensions.PADDING_SIZE_EXTRA_SMALL),
                           Text(
                             PriceConverter.convertPrice(
-                                item.variations[index].price),
+                                item.variations?[index].price ?? 0),
                             style: robotoMedium.copyWith(
                                 fontSize: Dimensions.FONT_SIZE_SMALL),
                           ),
                           SizedBox(
-                              width: _module.stock
+                              width: (_module.stock ?? false)
                                   ? Dimensions.PADDING_SIZE_EXTRA_SMALL
                                   : 0),
-                          _module.stock
+                          (_module.stock ?? false)
                               ? Text(
-                                  '(${item.variations[index].stock})',
+                                  '(${item.variations?[index].stock})',
                                   style: robotoMedium.copyWith(
                                       fontSize: Dimensions.FONT_SIZE_SMALL),
                                 )
@@ -212,18 +217,18 @@ class ItemDetailsScreen extends StatelessWidget {
                     )
                   : SizedBox(),
               SizedBox(
-                  height: item.variations.length > 0
+                  height: (item.variations ?? []).length > 0
                       ? Dimensions.PADDING_SIZE_LARGE
                       : 0),
               Row(children: [
-                _module.stock
+                (_module.stock ?? false)
                     ? Text('${'total_stock'.tr}:', style: robotoMedium)
                     : SizedBox(),
                 SizedBox(
-                    width: _module.stock
+                    width: (_module.stock ?? false)
                         ? Dimensions.PADDING_SIZE_EXTRA_SMALL
                         : 0),
-                _module.stock
+                (_module.stock ?? false)
                     ? Text(
                         item.stock.toString(),
                         style: robotoMedium.copyWith(
@@ -232,28 +237,31 @@ class ItemDetailsScreen extends StatelessWidget {
                     : SizedBox(),
               ]),
               SizedBox(
-                  height: _module.stock ? Dimensions.PADDING_SIZE_LARGE : 0),
-              (item.addOns.length > 0 && _module.addOn)
+                  height: (_module.stock ?? false)
+                      ? Dimensions.PADDING_SIZE_LARGE
+                      : 0),
+              ((item.addOns ?? []).length > 0 && (_module.addOn ?? false))
                   ? Text('addons'.tr, style: robotoMedium)
                   : SizedBox(),
               SizedBox(
-                  height: (item.addOns.length > 0 && _module.addOn)
+                  height: ((item.addOns ?? []).length > 0 &&
+                          (_module.addOn ?? false))
                       ? Dimensions.PADDING_SIZE_EXTRA_SMALL
                       : 0),
-              (item.addOns.length > 0 && _module.addOn)
+              ((item.addOns ?? []).length > 0 && (_module.addOn ?? false))
                   ? ListView.builder(
-                      itemCount: item.addOns.length,
+                      itemCount: (item.addOns ?? []).length,
                       physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       itemBuilder: (context, index) {
                         return Row(children: [
-                          Text(item.addOns[index].name + ':',
+                          Text((item.addOns?[index].name ?? '') + ':',
                               style: robotoRegular.copyWith(
                                   fontSize: Dimensions.FONT_SIZE_SMALL)),
                           SizedBox(width: Dimensions.PADDING_SIZE_EXTRA_SMALL),
                           Text(
                             PriceConverter.convertPrice(
-                                item.addOns[index].price),
+                                item.addOns?[index].price),
                             style: robotoMedium.copyWith(
                                 fontSize: Dimensions.FONT_SIZE_SMALL),
                           ),
@@ -262,21 +270,26 @@ class ItemDetailsScreen extends StatelessWidget {
                     )
                   : SizedBox(),
               SizedBox(
-                  height: item.addOns.length > 0
+                  height: (item.addOns ?? []).length > 0
                       ? Dimensions.PADDING_SIZE_LARGE
                       : 0),
-              (item.description != null && item.description.isNotEmpty)
+              (item.description != null && (item.description ?? '').isNotEmpty)
                   ? Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('description'.tr, style: robotoMedium),
                         SizedBox(height: Dimensions.PADDING_SIZE_EXTRA_SMALL),
-                        Text(item.description, style: robotoRegular),
+                        Text(item.description.toString(), style: robotoRegular),
                         SizedBox(height: Dimensions.PADDING_SIZE_LARGE),
                       ],
                     )
                   : SizedBox(),
-              Get.find<AuthController>().profileModel.stores[0].reviewsSection
+              Get.find<AuthController>()
+                          .profileModel
+                          .stores
+                          ?.first
+                          .reviewsSection ??
+                      false
                   ? Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -324,9 +337,11 @@ class ItemDetailsScreen extends StatelessWidget {
           CustomButton(
             onPressed: () {
               if (Get.find<AuthController>()
-                  .profileModel
-                  .stores[0]
-                  .itemSection) {
+                      .profileModel
+                      .stores
+                      ?.first
+                      .itemSection ??
+                  false) {
                 // TODO: add product
                 Get.toNamed(RouteHelper.getItemRoute(item));
               } else {

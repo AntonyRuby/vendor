@@ -29,7 +29,7 @@ class NotificationDialog extends StatelessWidget {
               ),
             ),
             (notificationModel.image != null &&
-                    notificationModel.image.isNotEmpty)
+                    notificationModel.image.toString().isNotEmpty)
                 ? Container(
                     width: MediaQuery.of(context).size.width,
                     margin: EdgeInsets.symmetric(
@@ -45,7 +45,7 @@ class NotificationDialog extends StatelessWidget {
                       child: CustomImage(
                         isNotification: true,
                         image:
-                            '${Get.find<SplashController>().configModel.baseUrls.notificationImageUrl}/${notificationModel.image}',
+                            '${Get.find<SplashController>().configModel.baseUrls?.notificationImageUrl}/${notificationModel.image}',
                         width: MediaQuery.of(context).size.width,
                         fit: BoxFit.contain,
                       ),
@@ -54,14 +54,14 @@ class NotificationDialog extends StatelessWidget {
                 : SizedBox(),
             SizedBox(
                 height: (notificationModel.image != null &&
-                        notificationModel.image.isNotEmpty)
+                        notificationModel.image.toString().isNotEmpty)
                     ? Dimensions.PADDING_SIZE_LARGE
                     : 0),
             Padding(
               padding: EdgeInsets.symmetric(
                   horizontal: Dimensions.PADDING_SIZE_LARGE),
               child: Text(
-                notificationModel.title,
+                notificationModel.title.toString(),
                 textAlign: TextAlign.center,
                 style: robotoMedium.copyWith(
                     color: Theme.of(context).primaryColor,
@@ -71,7 +71,7 @@ class NotificationDialog extends StatelessWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(20, 10, 20, 20),
               child: Text(
-                notificationModel.description,
+                notificationModel.description.toString(),
                 textAlign: TextAlign.center,
                 style: robotoRegular.copyWith(
                     color: Theme.of(context).disabledColor),

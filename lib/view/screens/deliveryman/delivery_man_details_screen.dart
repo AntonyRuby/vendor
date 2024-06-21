@@ -20,8 +20,10 @@ class DeliveryManDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Get.find<DeliveryManController>().setSuspended(!deliveryMan.status);
-    Get.find<DeliveryManController>().getDeliveryManReviewList(deliveryMan.id);
+    Get.find<DeliveryManController>()
+        .setSuspended(!(deliveryMan.status ?? false));
+    Get.find<DeliveryManController>()
+        .getDeliveryManReviewList((deliveryMan.id ?? 0));
 
     return Scaffold(
       appBar: CustomAppBar(title: 'delivery_man_details'.tr),
@@ -45,7 +47,7 @@ class DeliveryManDetailsScreen extends StatelessWidget {
                   child: ClipOval(
                       child: CustomImage(
                     image:
-                        '${Get.find<SplashController>().configModel.baseUrls.deliveryManImageUrl}/${deliveryMan.image}',
+                        '${Get.find<SplashController>().configModel.baseUrls?.deliveryManImageUrl}/${deliveryMan.image}',
                     height: 70,
                     width: 70,
                     fit: BoxFit.cover,
@@ -77,7 +79,7 @@ class DeliveryManDetailsScreen extends StatelessWidget {
                       Row(children: [
                         Icon(Icons.star,
                             color: Theme.of(context).primaryColor, size: 20),
-                        Text(deliveryMan.avgRating.toStringAsFixed(1),
+                        Text((deliveryMan.avgRating ?? 0).toStringAsFixed(1),
                             style: robotoRegular),
                         SizedBox(width: Dimensions.PADDING_SIZE_SMALL),
                         Text(
@@ -151,7 +153,7 @@ class DeliveryManDetailsScreen extends StatelessWidget {
                     ? 'are_you_sure_want_to_un_suspend_this_delivery_man'.tr
                     : 'are_you_sure_want_to_suspend_this_delivery_man'.tr,
                 onYesPressed: () =>
-                    dmController.toggleSuspension(deliveryMan.id),
+                    dmController.toggleSuspension(deliveryMan.id ?? 0),
               ));
             },
             buttonText: dmController.isSuspended

@@ -92,7 +92,8 @@ class LanguageScreen extends StatelessWidget {
                     localizationController.selectedIndex != -1) {
                   localizationController.setLanguage(Locale(
                     AppConstants.languages[localizationController.selectedIndex]
-                        .languageCode,
+                        .languageCode
+                        .toString(),
                     AppConstants.languages[localizationController.selectedIndex]
                         .countryCode,
                   ));

@@ -19,8 +19,8 @@ import 'package:get/get.dart';
 class ItemBottomSheet extends StatelessWidget {
   final Item item;
   final bool isCampaign;
-  final CartModel cart;
-  final int cartIndex;
+  final CartModel? cart;
+  final int? cartIndex;
   ItemBottomSheet(
       {required this.item, this.isCampaign = false, this.cart, this.cartIndex});
 
@@ -28,7 +28,7 @@ class ItemBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     bool fromCart = cart != null;
-    Get.find<PosController>().initData(item, cart);
+    Get.find<PosController>().initData(item, cart ?? CartModel());
 
     return Container(
       width: 550,
@@ -45,23 +45,27 @@ class ItemBottomSheet extends StatelessWidget {
       child: GetBuilder<PosController>(builder: (posController) {
         double _startingPrice;
         double _endingPrice;
-        if (item.choiceOptions.length != 0) {
+        if ((item.choiceOptions ?? []).length != 0) {
           List<double> _priceList = [];
           item.variations
-              .forEach((variation) => _priceList.add(variation.price));
+              ?.forEach((variation) => _priceList.add(variation.price ?? 0));
           _priceList.sort((a, b) => a.compareTo(b));
           _startingPrice = _priceList[0];
           if (_priceList[0] < _priceList[_priceList.length - 1]) {
             _endingPrice = _priceList[_priceList.length - 1];
           }
         } else {
-          _startingPrice = item.price;
+          _startingPrice = item.price ?? 0;
         }
 
         List<String> _variationList = [];
-        for (int index = 0; index < item.choiceOptions.length; index++) {
-          _variationList.add(item
-              .choiceOptions[index].options[posController.variationIndex[index]]
+        for (int index = 0;
+            index < (item.choiceOptions ?? []).length;
+            index++) {
+          _variationList.add((item.choiceOptions![index]
+                      .options?[posController.variationIndex[index]] ??
+                  0)
+              .toString()
               .replaceAll(' ', ''));
         }
         String variationType = '';
@@ -75,46 +79,49 @@ class ItemBottomSheet extends StatelessWidget {
           }
         });
 
-        double price = item.price;
-        Variation _variation;
-        for (Variation variation in item.variations) {
+        double price = item.price ?? 0;
+        Variation _variation = Variation();
+        for (Variation variation in item.variations ?? []) {
           if (variation.type == variationType) {
-            price = variation.price;
+            price = variation.price ?? 0;
             _variation = variation;
             break;
           }
         }
 
-        double _discount = (isCampaign || item.storeDiscount == 0)
-            ? item.discount
-            : item.storeDiscount;
-        String _discountType = (isCampaign || item.storeDiscount == 0)
-            ? item.discountType
-            : 'percent';
+        double _discount = ((isCampaign || item.storeDiscount == 0)
+                ? item.discount
+                : item.storeDiscount) ??
+            0;
+        String _discountType = ((isCampaign || item.storeDiscount == 0)
+                ? item.discountType
+                : 'percent') ??
+            '';
         double priceWithDiscount =
             PriceConverter.convertWithDiscount(price, _discount, _discountType);
         double priceWithQuantity = priceWithDiscount * posController.quantity;
         double addonsCost = 0;
         List<AddOn> _addOnIdList = [];
         List<AddOns> _addOnsList = [];
-        for (int index = 0; index < item.addOns.length; index++) {
+        for (int index = 0; index < (item.addOns ?? []).length; index++) {
           if (posController.addOnActiveList[index]) {
             addonsCost = addonsCost +
-                (item.addOns[index].price * posController.addOnQtyList[index]);
+                ((item.addOns?[index].price ?? 0) *
+                    posController.addOnQtyList[index]);
             _addOnIdList.add(AddOn(
-                id: item.addOns[index].id,
+                id: item.addOns?[index].id,
                 quantity: posController.addOnQtyList[index]));
-            _addOnsList.add(item.addOns[index]);
+            _addOnsList.add((item.addOns?[index] ?? AddOns()));
           }
         }
         double priceWithAddons = priceWithQuantity + addonsCost;
         bool _isAvailable = DateConverter.isAvailable(
-            item.availableTimeStarts, item.availableTimeEnds);
+            item.availableTimeStarts ?? '', item.availableTimeEnds ?? '');
 
         CartModel _cartModel = CartModel(
           price: price,
           discountedPrice: priceWithDiscount,
-          variation: _variation != null ? [_variation] : [],
+          variation: [_variation],
           discountAmount: (price -
               PriceConverter.convertWithDiscount(
                   price, _discount, _discountType)),
@@ -155,7 +162,7 @@ class ItemBottomSheet extends StatelessWidget {
                                       Dimensions.RADIUS_SMALL),
                                   child: CustomImage(
                                     image:
-                                        '${isCampaign ? Get.find<SplashController>().configModel.baseUrls.campaignImageUrl : Get.find<SplashController>().configModel.baseUrls.itemImageUrl}/${item.image}',
+                                        '${isCampaign ? Get.find<SplashController>().configModel.baseUrls?.campaignImageUrl : Get.find<SplashController>().configModel.baseUrls?.itemImageUrl}/${item.image}',
                                     width: ResponsiveHelper.isMobile(context)
                                         ? 100
                                         : 140,
@@ -177,7 +184,7 @@ class ItemBottomSheet extends StatelessWidget {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        item.name,
+                                        item.name.toString(),
                                         style: robotoMedium.copyWith(
                                             fontSize:
                                                 Dimensions.FONT_SIZE_LARGE),
@@ -185,29 +192,30 @@ class ItemBottomSheet extends StatelessWidget {
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                       RatingBar(
-                                          rating: item.avgRating,
-                                          size: 15,
-                                          ratingCount: item.ratingCount),
-                                      SizedBox(height: 5),
-                                      Text(
-                                        '${PriceConverter.convertPrice(_startingPrice, discount: _discount, discountType: _discountType)}'
-                                        '${_endingPrice != null ? ' - ${PriceConverter.convertPrice(_endingPrice, discount: _discount, discountType: _discountType)}' : ''}',
-                                        style: robotoMedium.copyWith(
-                                            fontSize:
-                                                Dimensions.FONT_SIZE_LARGE),
+                                        rating: item.avgRating ?? 0,
+                                        size: 15,
+                                        ratingCount: item.ratingCount ?? 0,
                                       ),
                                       SizedBox(height: 5),
-                                      price > priceWithDiscount
-                                          ? Text(
-                                              '${PriceConverter.convertPrice(_startingPrice)}'
-                                              '${_endingPrice != null ? ' - ${PriceConverter.convertPrice(_endingPrice)}' : ''}',
-                                              style: robotoMedium.copyWith(
-                                                  color: Theme.of(context)
-                                                      .disabledColor,
-                                                  decoration: TextDecoration
-                                                      .lineThrough),
-                                            )
-                                          : SizedBox(),
+                                      // Text(
+                                      //   '${PriceConverter.convertPrice(_startingPrice, discount: _discount, discountType: _discountType)}'
+                                      //   '${_endingPrice != null ? ' - ${PriceConverter.convertPrice(_endingPrice, discount: _discount, discountType: _discountType)}' : ''}',
+                                      //   style: robotoMedium.copyWith(
+                                      //       fontSize:
+                                      //           Dimensions.FONT_SIZE_LARGE),
+                                      // ),
+                                      SizedBox(height: 5),
+                                      // price > priceWithDiscount
+                                      //     ? Text(
+                                      //         '${PriceConverter.convertPrice(_startingPrice)}'
+                                      //         '${_endingPrice != null ? ' - ${PriceConverter.convertPrice(_endingPrice)}' : ''}',
+                                      //         style: robotoMedium.copyWith(
+                                      //             color: Theme.of(context)
+                                      //                 .disabledColor,
+                                      //             decoration: TextDecoration
+                                      //                 .lineThrough),
+                                      //       )
+                                      //     : SizedBox(),
                                     ]),
                               ),
                             ]),
@@ -215,7 +223,7 @@ class ItemBottomSheet extends StatelessWidget {
                         SizedBox(height: Dimensions.PADDING_SIZE_LARGE),
 
                         (item.description != null &&
-                                item.description.isNotEmpty)
+                                item.description.toString().isNotEmpty)
                             ? Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -223,7 +231,8 @@ class ItemBottomSheet extends StatelessWidget {
                                   SizedBox(
                                       height:
                                           Dimensions.PADDING_SIZE_EXTRA_SMALL),
-                                  Text(item.description, style: robotoRegular),
+                                  Text(item.description.toString(),
+                                      style: robotoRegular),
                                   SizedBox(
                                       height: Dimensions.PADDING_SIZE_LARGE),
                                 ],
@@ -233,13 +242,15 @@ class ItemBottomSheet extends StatelessWidget {
                         // Variation
                         ListView.builder(
                           shrinkWrap: true,
-                          itemCount: item.choiceOptions.length,
+                          itemCount: (item.choiceOptions ?? []).length,
                           physics: NeverScrollableScrollPhysics(),
                           itemBuilder: (context, index) {
                             return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(item.choiceOptions[index].title,
+                                  Text(
+                                      (item.choiceOptions?[index].title)
+                                          .toString(),
                                       style: robotoMedium),
                                   SizedBox(
                                       height:
@@ -257,8 +268,10 @@ class ItemBottomSheet extends StatelessWidget {
                                     ),
                                     shrinkWrap: true,
                                     physics: NeverScrollableScrollPhysics(),
-                                    itemCount: item
-                                        .choiceOptions[index].options.length,
+                                    itemCount:
+                                        (item.choiceOptions?[index].options ??
+                                                [])
+                                            .length,
                                     itemBuilder: (context, i) {
                                       return InkWell(
                                         onTap: () {
@@ -292,7 +305,9 @@ class ItemBottomSheet extends StatelessWidget {
                                                     : null,
                                           ),
                                           child: Text(
-                                            item.choiceOptions[index].options[i]
+                                            (item.choiceOptions?[index]
+                                                    .options?[i])
+                                                .toString()
                                                 .trim(),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
@@ -310,14 +325,16 @@ class ItemBottomSheet extends StatelessWidget {
                                     },
                                   ),
                                   SizedBox(
-                                      height:
-                                          index != item.choiceOptions.length - 1
-                                              ? Dimensions.PADDING_SIZE_LARGE
-                                              : 0),
+                                      height: index !=
+                                              (item.choiceOptions ?? [])
+                                                      .length -
+                                                  1
+                                          ? Dimensions.PADDING_SIZE_LARGE
+                                          : 0),
                                 ]);
                           },
                         ),
-                        item.choiceOptions.length > 0
+                        (item.choiceOptions ?? []).length > 0
                             ? SizedBox(height: Dimensions.PADDING_SIZE_LARGE)
                             : SizedBox(),
 
@@ -347,7 +364,7 @@ class ItemBottomSheet extends StatelessWidget {
                         SizedBox(height: Dimensions.PADDING_SIZE_LARGE),
 
                         // Addons
-                        item.addOns.length > 0
+                        (item.addOns ?? []).length > 0
                             ? Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -365,7 +382,7 @@ class ItemBottomSheet extends StatelessWidget {
                                       ),
                                       shrinkWrap: true,
                                       physics: NeverScrollableScrollPhysics(),
-                                      itemCount: item.addOns.length,
+                                      itemCount: (item.addOns ?? []).length,
                                       itemBuilder: (context, index) {
                                         return InkWell(
                                           onTap: () {
@@ -393,7 +410,8 @@ class ItemBottomSheet extends StatelessWidget {
                                                   ? Theme.of(context)
                                                       .primaryColor
                                                   : Theme.of(context)
-                                                      .backgroundColor,
+                                                      .colorScheme
+                                                      .surface,
                                               borderRadius:
                                                   BorderRadius.circular(
                                                       Dimensions.RADIUS_SMALL),
@@ -409,9 +427,10 @@ class ItemBottomSheet extends StatelessWidget {
                                                   ? [
                                                       BoxShadow(
                                                           color: Colors.grey[
-                                                              Get.isDarkMode
-                                                                  ? 700
-                                                                  : 300],
+                                                                  Get.isDarkMode
+                                                                      ? 700
+                                                                      : 300] ??
+                                                              Colors.red,
                                                           blurRadius: 5,
                                                           spreadRadius: 1)
                                                     ]
@@ -425,7 +444,9 @@ class ItemBottomSheet extends StatelessWidget {
                                                             .center,
                                                     children: [
                                                       Text(
-                                                        item.addOns[index].name,
+                                                        item.addOns?[index]
+                                                                .name ??
+                                                            '',
                                                         maxLines: 2,
                                                         overflow: TextOverflow
                                                             .ellipsis,
@@ -446,7 +467,7 @@ class ItemBottomSheet extends StatelessWidget {
                                                       Text(
                                                         PriceConverter
                                                             .convertPrice(item
-                                                                .addOns[index]
+                                                                .addOns?[index]
                                                                 .price),
                                                         maxLines: 1,
                                                         overflow: TextOverflow
@@ -578,15 +599,15 @@ class ItemBottomSheet extends StatelessWidget {
                                         color: Theme.of(context).primaryColor,
                                         fontSize: Dimensions.FONT_SIZE_LARGE,
                                       )),
-                                  Text(
-                                    '${'available_will_be'.tr} ${DateConverter.convertStringTimeToTime(item.availableTimeStarts)} '
-                                    '- ${DateConverter.convertStringTimeToTime(item.availableTimeEnds)}',
-                                    style: robotoRegular,
-                                  ),
+                                  // Text(
+                                  //   '${'available_will_be'.tr} ${DateConverter.convertStringTimeToTime(item.availableTimeStarts)} '
+                                  //   '- ${DateConverter.convertStringTimeToTime(item.availableTimeEnds)}',
+                                  //   style: robotoRegular,
+                                  // ),
                                 ]),
                               ),
 
-                        (!item.scheduleOrder && !_isAvailable)
+                        (!(item.scheduleOrder ?? false) && !_isAvailable)
                             ? SizedBox()
                             : CustomButton(
                                 width: ResponsiveHelper.isDesktop(context)
@@ -604,7 +625,7 @@ class ItemBottomSheet extends StatelessWidget {
                                   if (isCampaign) {
                                   } else {
                                     Get.find<PosController>()
-                                        .addToCart(_cartModel, cartIndex);
+                                        .addToCart(_cartModel, cartIndex ?? 0);
                                     showCustomSnackBar(
                                         fromCart
                                             ? 'item_updated'.tr

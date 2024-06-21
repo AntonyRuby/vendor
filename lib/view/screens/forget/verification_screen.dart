@@ -21,7 +21,7 @@ class VerificationScreen extends StatefulWidget {
 }
 
 class _VerificationScreenState extends State<VerificationScreen> {
-  Timer _timer;
+  Timer? _timer;
   int _seconds = 0;
 
   @override
@@ -36,7 +36,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       _seconds = _seconds - 1;
       if (_seconds == 0) {
-        timer?.cancel();
+        timer.cancel();
         _timer?.cancel();
       }
       setState(() {});
@@ -65,7 +65,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                 width: 1170,
                 child: GetBuilder<AuthController>(builder: (authController) {
                   return Column(children: [
-                    Get.find<SplashController>().configModel.demo
+                    Get.find<SplashController>().configModel.demo ?? false
                         ? Text(
                             'for_demo_purpose'.tr,
                             style: robotoRegular,
@@ -80,9 +80,10 @@ class _VerificationScreenState extends State<VerificationScreen> {
                                 text: ' ${widget.email}',
                                 style: robotoMedium.copyWith(
                                     color: Theme.of(context)
-                                        .textTheme
-                                        .bodyText1
-                                        .color)),
+                                            .textTheme
+                                            .bodyLarge
+                                            ?.color ??
+                                        Colors.red)),
                           ])),
                     Padding(
                       padding: const EdgeInsets.symmetric(
@@ -130,13 +131,13 @@ class _VerificationScreenState extends State<VerificationScreen> {
                                 authController
                                     .forgetPassword(widget.email)
                                     .then((value) {
-                                  if (value.isSuccess) {
+                                  if (value.isSuccess ?? false) {
                                     _startTimer();
                                     showCustomSnackBar(
                                         'resend_code_successful'.tr,
                                         isError: false);
                                   } else {
-                                    showCustomSnackBar(value.message);
+                                    showCustomSnackBar(value.message ?? '');
                                   }
                                 });
                               }
@@ -153,14 +154,14 @@ class _VerificationScreenState extends State<VerificationScreen> {
                                   authController
                                       .verifyToken(widget.email)
                                       .then((value) {
-                                    if (value.isSuccess) {
+                                    if (value.isSuccess ?? false) {
                                       Get.toNamed(
                                           RouteHelper.getResetPasswordRoute(
                                               widget.email,
                                               authController.verificationCode,
                                               'reset-password'));
                                     } else {
-                                      showCustomSnackBar(value.message);
+                                      showCustomSnackBar(value.message ?? '');
                                     }
                                   });
                                 },

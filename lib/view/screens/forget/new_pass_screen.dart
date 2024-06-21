@@ -58,7 +58,8 @@ class _NewPassScreenState extends State<NewPassScreen> {
                       color: Theme.of(context).cardColor,
                       boxShadow: [
                         BoxShadow(
-                            color: Colors.grey[Get.isDarkMode ? 800 : 200],
+                            color: Colors.grey[Get.isDarkMode ? 800 : 200] ??
+                                Colors.red,
                             spreadRadius: 1,
                             blurRadius: 5)
                       ],
@@ -119,14 +120,14 @@ class _NewPassScreenState extends State<NewPassScreen> {
             .resetPassword(
                 widget.resetToken, widget.email, _password, _confirmPassword)
             .then((value) {
-          if (value.isSuccess) {
+          if (value.isSuccess ?? false) {
             Get.find<AuthController>()
                 .login(widget.email, _password)
                 .then((value) async {
               Get.offAllNamed(RouteHelper.getInitialRoute());
             });
           } else {
-            showCustomSnackBar(value.message);
+            showCustomSnackBar(value.message ?? '');
           }
         });
       }

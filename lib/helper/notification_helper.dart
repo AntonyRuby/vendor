@@ -137,7 +137,7 @@ class NotificationHelper {
     if (!GetPlatform.isIOS) {
       String _title;
       String _body;
-      String _image;
+      String _image = '';
       NotificationBody _notificationBody;
 
       _title = message.notification?.title ?? '';
@@ -145,19 +145,23 @@ class NotificationHelper {
       _notificationBody = convertNotification(message.data);
 
       if (GetPlatform.isAndroid) {
-        _image = (message.notification?.android?.imageUrl != null &&
-                message.notification.android.imageUrl.isNotEmpty)
-            ? message.notification.android.imageUrl.startsWith('http')
-                ? message.notification.android.imageUrl
-                : '${AppConstants.BASE_URL}/storage/app/public/notification/${message.notification.android.imageUrl}'
-            : null;
+        _image = ((message.notification?.android?.imageUrl != null &&
+                    (message.notification?.android?.imageUrl ?? '').isNotEmpty)
+                ? (message.notification?.android?.imageUrl ?? '')
+                        .startsWith('http')
+                    ? message.notification?.android?.imageUrl
+                    : '${AppConstants.BASE_URL}/storage/app/public/notification/${message.notification?.android?.imageUrl}'
+                : null) ??
+            '';
       } else if (GetPlatform.isIOS) {
-        _image = (message.notification.apple.imageUrl != null &&
-                message.notification.apple.imageUrl.isNotEmpty)
-            ? message.notification.apple.imageUrl.startsWith('http')
-                ? message.notification.apple.imageUrl
-                : '${AppConstants.BASE_URL}/storage/app/public/notification/${message.notification.apple.imageUrl}'
-            : null;
+        _image = ((message.notification?.apple?.imageUrl != null &&
+                    (message.notification?.apple?.imageUrl ?? '').isNotEmpty)
+                ? (message.notification?.apple?.imageUrl ?? '')
+                        .startsWith('http')
+                    ? message.notification?.apple?.imageUrl
+                    : '${AppConstants.BASE_URL}/storage/app/public/notification/${message.notification?.apple?.imageUrl}'
+                : null) ??
+            '';
       }
 
       if (_image.isNotEmpty) {
@@ -300,7 +304,7 @@ class NotificationHelper {
 
 Future<dynamic> myBackgroundMessageHandler(RemoteMessage message) async {
   print(
-      "onBackground: ${message.notification.title}/${message.notification.body}/${message.notification.titleLocKey}");
+      "onBackground: ${message.notification?.title}/${message.notification?.body}/${message.notification?.titleLocKey}");
   // var androidInitialize = new AndroidInitializationSettings('notification_icon');
   // var iOSInitialize = new IOSInitializationSettings();
   // var initializationsSettings = new InitializationSettings(android: androidInitialize, iOS: iOSInitialize);

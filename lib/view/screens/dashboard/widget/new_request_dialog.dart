@@ -19,7 +19,7 @@ class NewRequestDialog extends StatefulWidget {
 }
 
 class _NewRequestDialogState extends State<NewRequestDialog> {
-  Timer _timer;
+  Timer? _timer;
 
   @override
   void initState() {
@@ -68,7 +68,7 @@ class _NewRequestDialogState extends State<NewRequestDialog> {
             buttonText: 'ok'.tr,
             onPressed: () {
               _timer?.cancel();
-              if (Get.isDialogOpen) {
+              if (Get.isDialogOpen ?? false) {
                 Get.back();
               }
 

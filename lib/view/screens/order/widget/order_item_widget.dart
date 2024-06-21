@@ -15,27 +15,29 @@ class OrderItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(
-        '--------${'${order.itemCampaign == 1 ? Get.find<SplashController>().configModel.baseUrls.campaignImageUrl : Get.find<SplashController>().configModel.baseUrls.itemImageUrl}/${orderDetails.itemDetails.image}'}');
+    // print(
+    //     '--------${'${order.itemCampaign == 1 ? Get.find<SplashController>().configModel.baseUrls?.campaignImageUrl : Get.find<SplashController>().configModel.baseUrls.itemImageUrl}/${orderDetails.itemDetails?.image}'}');
     String _addOnText = '';
-    orderDetails.addOns.forEach((addOn) {
+    orderDetails.addOns?.forEach((addOn) {
       _addOnText = _addOnText +
           '${(_addOnText.isEmpty) ? '' : ',  '}${addOn.name} (${addOn.quantity})';
     });
 
     String _variationText = '';
-    if (orderDetails.variation.length > 0) {
-      List<String> _variationTypes = orderDetails.variation[0].type.split('-');
+    if ((orderDetails.variation?.length ?? 0) > 0) {
+      List<String> _variationTypes =
+          (orderDetails.variation?.first.type).toString().split('-');
       if (_variationTypes.length ==
-          orderDetails.itemDetails.choiceOptions.length) {
+          (orderDetails.itemDetails?.choiceOptions ?? []).length) {
         int _index = 0;
-        orderDetails.itemDetails.choiceOptions.forEach((choice) {
+        (orderDetails.itemDetails?.choiceOptions ?? []).forEach((choice) {
           _variationText = _variationText +
               '${(_index == 0) ? '' : ',  '}${choice.title} - ${_variationTypes[_index]}';
           _index = _index + 1;
         });
       } else {
-        _variationText = orderDetails.itemDetails.variations[0].type;
+        _variationText =
+            (orderDetails.itemDetails?.variations?.first.type).toString();
       }
     }
 
@@ -48,7 +50,7 @@ class OrderItemWidget extends StatelessWidget {
             width: 50,
             fit: BoxFit.cover,
             image:
-                '${order.itemCampaign == 1 ? Get.find<SplashController>().configModel.baseUrls.campaignImageUrl : Get.find<SplashController>().configModel.baseUrls.itemImageUrl}/${orderDetails.itemDetails.image}',
+                '${order.itemCampaign == 1 ? Get.find<SplashController>().configModel.baseUrls?.campaignImageUrl : Get.find<SplashController>().configModel.baseUrls?.itemImageUrl}/${orderDetails.itemDetails?.image}',
           ),
         ),
         SizedBox(width: Dimensions.PADDING_SIZE_SMALL),
@@ -58,7 +60,7 @@ class OrderItemWidget extends StatelessWidget {
             Row(children: [
               Expanded(
                   child: Text(
-                orderDetails.itemDetails.name,
+                (orderDetails.itemDetails?.name).toString(),
                 style:
                     robotoMedium.copyWith(fontSize: Dimensions.FONT_SIZE_SMALL),
                 maxLines: 2,
@@ -81,20 +83,23 @@ class OrderItemWidget extends StatelessWidget {
                 PriceConverter.convertPrice(orderDetails.price),
                 style: robotoMedium,
               )),
-              ((Get.find<SplashController>()
-                              .configModel
-                              .moduleConfig
-                              .module
-                              .unit &&
-                          orderDetails.itemDetails.unitType != null) ||
-                      (Get.find<SplashController>()
-                              .configModel
-                              .moduleConfig
-                              .module
-                              .vegNonVeg &&
-                          Get.find<SplashController>()
-                              .configModel
-                              .toggleVegNonVeg))
+              (((Get.find<SplashController>()
+                                  .configModel
+                                  .moduleConfig
+                                  ?.module
+                                  ?.unit ??
+                              false) &&
+                          orderDetails.itemDetails?.unitType != null) ||
+                      ((Get.find<SplashController>()
+                                  .configModel
+                                  .moduleConfig
+                                  ?.module
+                                  ?.vegNonVeg ??
+                              false) &&
+                          (Get.find<SplashController>()
+                                  .configModel
+                                  .toggleVegNonVeg ??
+                              false)))
                   ? Container(
                       padding: EdgeInsets.symmetric(
                           vertical: Dimensions.PADDING_SIZE_EXTRA_SMALL,
@@ -105,13 +110,14 @@ class OrderItemWidget extends StatelessWidget {
                         color: Theme.of(context).primaryColor,
                       ),
                       child: Text(
-                        Get.find<SplashController>()
-                                .configModel
-                                .moduleConfig
-                                .module
-                                .unit
-                            ? orderDetails.itemDetails.unitType ?? ''
-                            : orderDetails.itemDetails.veg == 0
+                        (Get.find<SplashController>()
+                                    .configModel
+                                    .moduleConfig
+                                    ?.module
+                                    ?.unit ??
+                                false)
+                            ? orderDetails.itemDetails?.unitType ?? ''
+                            : orderDetails.itemDetails?.veg == 0
                                 ? 'non_veg'.tr
                                 : 'veg'.tr,
                         style: robotoRegular.copyWith(
@@ -142,7 +148,7 @@ class OrderItemWidget extends StatelessWidget {
               ]),
             )
           : SizedBox(),
-      orderDetails.itemDetails.variations.length > 0
+      (orderDetails.itemDetails?.variations ?? []).length > 0
           ? Padding(
               padding:
                   EdgeInsets.only(top: Dimensions.PADDING_SIZE_EXTRA_SMALL),

@@ -47,6 +47,8 @@ class AuthController extends GetxController implements GetxService {
     heading: 1,
     speed: 1,
     speedAccuracy: 1,
+    altitudeAccuracy: 0,
+    headingAccuracy: 0,
   );
   String _pickAddress = '';
   bool _loading = false;
@@ -479,6 +481,8 @@ class AuthController extends GetxController implements GetxService {
       heading: 1,
       speed: 1,
       speedAccuracy: 1,
+      altitudeAccuracy: 0,
+      headingAccuracy: 0,
     );
 
     _pickAddress = address;

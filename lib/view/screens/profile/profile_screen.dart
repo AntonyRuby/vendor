@@ -46,7 +46,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: FadeInImage.assetNetwork(
                     placeholder: Images.placeholder,
                     image:
-                        '${Get.find<SplashController>().configModel.baseUrls.vendorImageUrl}'
+                        '${Get.find<SplashController>().configModel.baseUrls?.vendorImageUrl}'
                         '/${authController.profileModel != null ? authController.profileModel.image : ''}',
                     height: 100,
                     width: 100,

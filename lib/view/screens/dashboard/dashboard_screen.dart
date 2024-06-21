@@ -20,10 +20,11 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  PageController _pageController;
+  PageController _pageController = PageController();
   int _pageIndex = 0;
-  List<Widget> _screens;
-  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+  List<Widget> _screens = [];
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
   // Timer _timer;
   // int _orderCount;
 

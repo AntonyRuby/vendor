@@ -25,7 +25,7 @@ class _AddNameScreenState extends State<AddNameScreen> {
   List<FocusNode> _nameFocusList = [];
   List<FocusNode> _descriptionFocusList = [];
   List<Language> _languageList =
-      Get.find<SplashController>().configModel.language;
+      Get.find<SplashController>().configModel.language ?? [];
 
   @override
   void initState() {
@@ -35,15 +35,21 @@ class _AddNameScreenState extends State<AddNameScreen> {
       for (int index = 0; index < _languageList.length; index++) {
         _nameControllerList.add(TextEditingController(
           text: widget
-              .item.translations[widget.item.translations.length - 2].value,
+                  .item
+                  ?.translations?[(widget.item?.translations?.length ?? 0) - 2]
+                  .value ??
+              '',
         ));
         _descriptionControllerList.add(TextEditingController(
-          text: widget
-              .item.translations[widget.item.translations.length - 1].value,
+          text: (widget
+                  .item
+                  ?.translations?[(widget.item?.translations?.length ?? 0) - 1]
+                  .value) ??
+              '',
         ));
         _nameFocusList.add(FocusNode());
         _descriptionFocusList.add(FocusNode());
-        widget.item.translations.forEach((translation) {
+        widget.item?.translations?.forEach((translation) {
           if (_languageList[index].key == translation.locale &&
               translation.key == 'name') {
             _nameControllerList[index] =
@@ -79,7 +85,7 @@ class _AddNameScreenState extends State<AddNameScreen> {
             itemCount: _languageList.length,
             itemBuilder: (context, index) {
               return Column(children: [
-                Text(_languageList[index].value, style: robotoBold),
+                Text(_languageList[index].value ?? '', style: robotoBold),
                 SizedBox(height: Dimensions.PADDING_SIZE_SMALL),
                 MyTextField(
                   hintText: 'item_name'.tr,
@@ -140,8 +146,8 @@ class _AddNameScreenState extends State<AddNameScreen> {
                             : _descriptionControllerList[0].text.trim(),
                   ));
                 }
-                Get.toNamed(
-                    RouteHelper.getAddItemRoute(widget.item, _translations));
+                Get.toNamed(RouteHelper.getAddItemRoute(
+                    widget.item ?? Item(), _translations));
               }
             },
           ),

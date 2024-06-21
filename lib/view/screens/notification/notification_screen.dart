@@ -50,10 +50,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
             }),
         body: GetBuilder<NotificationController>(
             builder: (notificationController) {
-          if (notificationController.notificationList != null) {
-            notificationController.saveSeenNotificationCount(
-                notificationController.notificationList.length);
-          }
+          notificationController.saveSeenNotificationCount(
+              notificationController.notificationList.length);
           List<DateTime> _dateTimeList = [];
           return notificationController.notificationList != null
               ? notificationController.notificationList.length > 0
@@ -79,7 +77,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                                       notificationController
                                                           .notificationList[
                                                               index]
-                                                          .createdAt);
+                                                          .createdAt
+                                                          .toString());
                                           DateTime _convertedDate = DateTime(
                                               _originalDateTime.year,
                                               _originalDateTime.month,
@@ -104,7 +103,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                                                 notificationController
                                                                     .notificationList[
                                                                         index]
-                                                                    .createdAt)),
+                                                                    .createdAt
+                                                                    .toString())),
                                                       )
                                                     : SizedBox(),
                                                 ListTile(
@@ -127,7 +127,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                                     width: 40,
                                                     fit: BoxFit.cover,
                                                     image:
-                                                        '${Get.find<SplashController>().configModel.baseUrls.notificationImageUrl}'
+                                                        '${Get.find<SplashController>().configModel.baseUrls?.notificationImageUrl}'
                                                         '/${notificationController.notificationList[index].image}',
                                                   )),
                                                   title: Text(

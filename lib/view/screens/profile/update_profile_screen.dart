@@ -23,16 +23,12 @@ class UpdateProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (Get.find<AuthController>().profileModel == null) {
-      Get.find<AuthController>().getProfile();
-    }
     Get.find<AuthController>().initData();
 
     return Scaffold(
       backgroundColor: Theme.of(context).cardColor,
       body: GetBuilder<AuthController>(builder: (authController) {
-        if (authController.profileModel != null &&
-            _emailController.text.isEmpty) {
+        if (_emailController.text.isEmpty) {
           _firstNameController.text = authController.profileModel.fName ?? '';
           _lastNameController.text = authController.profileModel.lName ?? '';
           _phoneController.text = authController.profileModel.phone ?? '';
@@ -48,13 +44,13 @@ class UpdateProfileScreen extends StatelessWidget {
                       child: authController.pickedFile != null
                           ? GetPlatform.isWeb
                               ? Image.network(
-                                  authController.pickedFile.path,
+                                  authController.pickedFile?.path ?? '',
                                   width: 100,
                                   height: 100,
                                   fit: BoxFit.cover,
                                 )
                               : Image.file(
-                                  File(authController.pickedFile.path),
+                                  File(authController.pickedFile?.path ?? ''),
                                   width: 100,
                                   height: 100,
                                   fit: BoxFit.cover,
@@ -62,7 +58,7 @@ class UpdateProfileScreen extends StatelessWidget {
                           : FadeInImage.assetNetwork(
                               placeholder: Images.placeholder,
                               image:
-                                  '${Get.find<SplashController>().configModel.baseUrls.deliveryManImageUrl}/${authController.profileModel.image}',
+                                  '${Get.find<SplashController>().configModel.baseUrls?.deliveryManImageUrl}/${authController.profileModel.image}',
                               height: 100,
                               width: 100,
                               fit: BoxFit.cover,

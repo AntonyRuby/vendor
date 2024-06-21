@@ -112,8 +112,8 @@ class RouteHelper {
   static String getCampaignDetailsRoute(int id) => '$campaignDetails?id=$id';
   static String getUpdateRoute(bool isUpdate) =>
       '$update?update=${isUpdate.toString()}';
-  static String getItemRoute(Item itemModel) {
-    List<int> _encoded = utf8.encode(jsonEncode(itemModel.toJson()));
+  static String getItemRoute(Item? itemModel) {
+    List<int> _encoded = utf8.encode(jsonEncode(itemModel?.toJson()));
     String _data = base64Encode(_encoded);
     return '$item?data=$_data';
   }
@@ -147,8 +147,8 @@ class RouteHelper {
 
   static String getPosRoute() => '$pos';
   static String getDeliveryManRoute() => '$deliveryMan';
-  static String getAddDeliveryManRoute(DeliveryManModel deliveryMan) {
-    List<int> _encoded = utf8.encode(jsonEncode(deliveryMan.toJson()));
+  static String getAddDeliveryManRoute(DeliveryManModel? deliveryMan) {
+    List<int> _encoded = utf8.encode(jsonEncode(deliveryMan?.toJson()));
     String _data = base64Encode(_encoded);
     return '$addDeliveryMan?data=$_data';
   }
@@ -168,14 +168,14 @@ class RouteHelper {
 
   static String getChatRoute(
       {required NotificationBody notificationBody,
-      User user,
-      int conversationId,
-      bool fromNotification}) {
+      User? user,
+      int conversationId = 0,
+      bool fromNotification = false}) {
     String _notificationBody = 'null';
     String _user = 'null';
 
     _notificationBody = base64Encode(utf8.encode(jsonEncode(notificationBody)));
-    _user = base64Encode(utf8.encode(jsonEncode(user.toJson())));
+    _user = base64Encode(utf8.encode(jsonEncode(user?.toJson())));
     return '$chatScreen?notification_body=$_notificationBody&user=$_user&conversation_id=$conversationId&from=${fromNotification.toString()}';
   }
 
@@ -187,7 +187,7 @@ class RouteHelper {
     GetPage(
         name: splash,
         page: () {
-          NotificationBody _data;
+          NotificationBody _data = NotificationBody();
           if (Get.parameters['data'] != 'null') {
             List<int> _decode =
                 base64Decode(Get.parameters['data'] ?? ''.replaceAll(' ', '+'));
@@ -273,7 +273,7 @@ class RouteHelper {
         page: () {
           List<Translation> _translations = [];
           jsonDecode(utf8.decode(base64Decode(
-                  Get.parameters['translations'].replaceAll(' ', '+'))))
+                  (Get.parameters['translations'] ?? '').replaceAll(' ', '+'))))
               .forEach((data) {
             _translations.add(Translation.fromJson(data));
           });
@@ -349,13 +349,13 @@ class RouteHelper {
     GetPage(
         name: chatScreen,
         page: () {
-          NotificationBody _notificationBody;
+          NotificationBody _notificationBody = NotificationBody();
           if (Get.parameters['notification_body'] != 'null') {
             _notificationBody = NotificationBody.fromJson(jsonDecode(utf8
                 .decode(base64Url.decode(Get.parameters['notification_body'] ??
                     ''.replaceAll(' ', '+')))));
           }
-          User _user;
+          User _user = User();
           if (Get.parameters['user'] != 'null') {
             _user = User.fromJson(jsonDecode(utf8.decode(base64Url
                 .decode(Get.parameters['user'] ?? ''.replaceAll(' ', '+')))));
@@ -364,10 +364,11 @@ class RouteHelper {
             notificationBody: _notificationBody,
             user: _user,
             fromNotification: Get.parameters['from'] == 'true',
-            conversationId: Get.parameters['conversation_id'] != null &&
-                    Get.parameters['conversation_id'] != 'null'
-                ? int.parse(Get.parameters['conversation_id'])
-                : null,
+            conversationId: (Get.parameters['conversation_id'] != null &&
+                        Get.parameters['conversation_id'] != 'null'
+                    ? int.parse(Get.parameters['conversation_id'] ?? '0')
+                    : null) ??
+                0,
           );
         }),
     GetPage(name: conversationListScreen, page: () => ConversationScreen()),

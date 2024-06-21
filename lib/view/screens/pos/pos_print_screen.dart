@@ -19,7 +19,7 @@ class _PosPrintScreenState extends State<PosPrintScreen> {
   List availableBluetoothDevices = [];
 
   Future<void> getBluetooth() async {
-    final List bluetooths = await BluetoothThermalPrinter.getBluetooths;
+    final List bluetooths = (await BluetoothThermalPrinter.getBluetooths) ?? [];
     print("Print $bluetooths");
     setState(() {
       availableBluetoothDevices = bluetooths;
@@ -27,7 +27,7 @@ class _PosPrintScreenState extends State<PosPrintScreen> {
   }
 
   Future<void> setConnect(String mac) async {
-    final String result = await BluetoothThermalPrinter.connect(mac);
+    final String result = (await BluetoothThermalPrinter.connect(mac)) ?? '';
     print("state conneected $result");
     if (result == "true") {
       setState(() {
@@ -37,7 +37,7 @@ class _PosPrintScreenState extends State<PosPrintScreen> {
   }
 
   Future<void> printTicket() async {
-    String isConnected = await BluetoothThermalPrinter.connectionStatus;
+    String isConnected = (await BluetoothThermalPrinter.connectionStatus) ?? '';
     if (isConnected == "true") {
       List<int> bytes = await getTicket();
       final result = await BluetoothThermalPrinter.writeBytes(bytes);
@@ -48,7 +48,7 @@ class _PosPrintScreenState extends State<PosPrintScreen> {
   }
 
   Future<void> printGraphics() async {
-    String isConnected = await BluetoothThermalPrinter.connectionStatus;
+    String isConnected = (await BluetoothThermalPrinter.connectionStatus) ?? '';
     if (isConnected == "true") {
       List<int> bytes = await getGraphicsTicket();
       final result = await BluetoothThermalPrinter.writeBytes(bytes);

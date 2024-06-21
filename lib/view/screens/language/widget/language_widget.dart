@@ -20,7 +20,7 @@ class LanguageWidget extends StatelessWidget {
     return InkWell(
       onTap: () {
         localizationController.setLanguage(Locale(
-          AppConstants.languages[index].languageCode,
+          AppConstants.languages[index].languageCode.toString(),
           AppConstants.languages[index].countryCode,
         ));
         localizationController.setSelectIndex(index);
@@ -33,7 +33,7 @@ class LanguageWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(Dimensions.RADIUS_SMALL),
           boxShadow: [
             BoxShadow(
-                color: Colors.grey[Get.isDarkMode ? 800 : 200],
+                color: Colors.grey[Get.isDarkMode ? 800 : 200] ?? Colors.red,
                 blurRadius: 5,
                 spreadRadius: 1)
           ],
@@ -47,22 +47,23 @@ class LanguageWidget extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(Dimensions.RADIUS_SMALL),
                   border: Border.all(
-                      color: Theme.of(context).textTheme.bodyText1.color,
+                      color: Theme.of(context).textTheme.bodyLarge?.color ??
+                          Colors.red,
                       width: 1),
                 ),
                 alignment: Alignment.center,
                 child: Image.asset(
-                  languageModel.imageUrl,
+                  languageModel.imageUrl ?? '',
                   width: 36,
                   height: 36,
                   color: languageModel.languageCode == 'en' ||
                           languageModel.languageCode == 'ar'
-                      ? Theme.of(context).textTheme.bodyText1.color
+                      ? Theme.of(context).textTheme.bodyLarge?.color
                       : null,
                 ),
               ),
               SizedBox(height: Dimensions.PADDING_SIZE_LARGE),
-              Text(languageModel.languageName, style: robotoRegular),
+              Text(languageModel.languageName.toString(), style: robotoRegular),
             ]),
           ),
           localizationController.selectedIndex == index

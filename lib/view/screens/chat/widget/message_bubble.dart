@@ -17,7 +17,7 @@ class MessageBubble extends StatelessWidget {
   final User sender;
   final UserType userType;
   const MessageBubble(
-      {Key key,
+      {Key? key,
       required this.message,
       required this.user,
       required this.userType,
@@ -26,10 +26,10 @@ class MessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    BaseUrls _baseUrl = Get.find<SplashController>().configModel.baseUrls;
+    BaseUrls? _baseUrl = Get.find<SplashController>().configModel.baseUrls;
     bool _isReply = message.senderId == user.id;
 
-    return (message != null && _isReply)
+    return (_isReply)
         ? Container(
             margin: const EdgeInsets.symmetric(
                 horizontal: 0.0, vertical: Dimensions.PADDING_SIZE_EXTRA_SMALL),
@@ -53,7 +53,7 @@ class MessageBubble extends StatelessWidget {
                         width: 40,
                         height: 40,
                         image:
-                            '${userType == UserType.customer ? _baseUrl.customerImageUrl : _baseUrl.deliveryManImageUrl}/${user.image}',
+                            '${userType == UserType.customer ? _baseUrl?.customerImageUrl : _baseUrl?.deliveryManImageUrl}/${user.image}',
                       ),
                       borderRadius: BorderRadius.circular(20.0),
                     ),
@@ -98,9 +98,9 @@ class MessageBubble extends StatelessWidget {
                                             crossAxisSpacing: 5),
                                     shrinkWrap: true,
                                     physics: NeverScrollableScrollPhysics(),
-                                    itemCount: message.files.length,
+                                    itemCount: (message.files ?? []).length,
                                     itemBuilder: (BuildContext context, index) {
-                                      return message.files.length > 0
+                                      return (message.files ?? []).length > 0
                                           ? Padding(
                                               padding: const EdgeInsets.only(
                                                   right: 8),
@@ -110,7 +110,7 @@ class MessageBubble extends StatelessWidget {
                                                     context: context,
                                                     builder: (ctx) => ImageDialog(
                                                         imageUrl:
-                                                            '${_baseUrl.chatImageUrl}/${message.files[index] ?? ''}')),
+                                                            '${_baseUrl?.chatImageUrl}/${message.files?[index] ?? ''}')),
                                                 child: ClipRRect(
                                                   borderRadius: BorderRadius
                                                       .circular(Dimensions
@@ -120,7 +120,7 @@ class MessageBubble extends StatelessWidget {
                                                     width: 100,
                                                     fit: BoxFit.cover,
                                                     image:
-                                                        '${_baseUrl.chatImageUrl}/${message.files[index] ?? ''}',
+                                                        '${_baseUrl?.chatImageUrl}/${message.files?[index] ?? ''}',
                                                   ),
                                                 ),
                                               ),
@@ -134,7 +134,7 @@ class MessageBubble extends StatelessWidget {
               SizedBox(height: Dimensions.PADDING_SIZE_SMALL),
               Text(
                 DateConverter.localDateToIsoStringAMPM(
-                    DateTime.parse(message.createdAt)),
+                    DateTime.parse(message.createdAt.toString())),
                 style: robotoRegular.copyWith(
                     color: Theme.of(context).hintColor,
                     fontSize: Dimensions.FONT_SIZE_SMALL),
@@ -166,7 +166,7 @@ class MessageBubble extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             (message.message != null &&
-                                    message.message.isNotEmpty)
+                                    (message.message ?? '').isNotEmpty)
                                 ? Flexible(
                                     child: Container(
                                       decoration: BoxDecoration(
@@ -206,16 +206,17 @@ class MessageBubble extends StatelessWidget {
                                                 crossAxisSpacing: 5),
                                         shrinkWrap: true,
                                         physics: NeverScrollableScrollPhysics(),
-                                        itemCount: message.files.length,
+                                        itemCount: (message.files ?? []).length,
                                         itemBuilder:
                                             (BuildContext context, index) {
-                                          return message.files.length > 0
+                                          return (message.files ?? []).length >
+                                                  0
                                               ? InkWell(
                                                   onTap: () => showDialog(
                                                       context: context,
                                                       builder: (ctx) => ImageDialog(
                                                           imageUrl:
-                                                              '${_baseUrl.chatImageUrl}/${message.files[index] ?? ''}')),
+                                                              '${_baseUrl?.chatImageUrl}/${message.files?[index] ?? ''}')),
                                                   child: Padding(
                                                     padding: EdgeInsets.only(
                                                       left: Dimensions
@@ -223,7 +224,8 @@ class MessageBubble extends StatelessWidget {
                                                       right: 0,
                                                       top: (message.message !=
                                                                   null &&
-                                                              message.message
+                                                              (message.message ??
+                                                                      '')
                                                                   .isNotEmpty)
                                                           ? Dimensions
                                                               .PADDING_SIZE_SMALL
@@ -238,7 +240,7 @@ class MessageBubble extends StatelessWidget {
                                                         width: 100,
                                                         fit: BoxFit.cover,
                                                         image:
-                                                            '${_baseUrl.chatImageUrl}/${message.files[index] ?? ''}',
+                                                            '${_baseUrl?.chatImageUrl}/${message.files?[index] ?? ''}',
                                                       ),
                                                     ),
                                                   ),
@@ -256,7 +258,7 @@ class MessageBubble extends StatelessWidget {
                         fit: BoxFit.cover,
                         width: 40,
                         height: 40,
-                        image: '${_baseUrl.storeImageUrl}/${sender.image}',
+                        image: '${_baseUrl?.storeImageUrl}/${sender.image}',
                       ),
                     ),
                   ]),
@@ -270,7 +272,7 @@ class MessageBubble extends StatelessWidget {
               SizedBox(height: Dimensions.PADDING_SIZE_SMALL),
               Text(
                 DateConverter.localDateToIsoStringAMPM(
-                    DateTime.parse(message.createdAt)),
+                    DateTime.parse(message.createdAt.toString())),
                 style: robotoRegular.copyWith(
                     color: Theme.of(context).hintColor,
                     fontSize: Dimensions.FONT_SIZE_SMALL),

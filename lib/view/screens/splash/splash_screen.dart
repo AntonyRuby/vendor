@@ -22,7 +22,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   GlobalKey<ScaffoldState> _globalKey = GlobalKey();
-  StreamSubscription<ConnectivityResult> _onConnectivityChanged;
+  late StreamSubscription<ConnectivityResult> _onConnectivityChanged;
 
   @override
   void initState() {
@@ -72,37 +72,23 @@ class _SplashScreenState extends State<SplashScreen> {
     Get.find<SplashController>().getConfigData().then((isSuccess) {
       if (isSuccess) {
         Timer(Duration(seconds: 1), () async {
-          if (Get.find<SplashController>().configModel.maintenanceMode) {
+          if (Get.find<SplashController>().configModel.maintenanceMode ??
+              false) {
             Get.offNamed(RouteHelper.getUpdateRoute(false));
           } else {
-            if (widget.body != null) {
-              if (widget.body.notificationType == NotificationType.order) {
-                Get.offNamed(RouteHelper.getOrderDetailsRoute(
-                    widget.body.orderId,
-                    fromNotification: true));
-              } else if (widget.body.notificationType ==
-                  NotificationType.general) {
-                Get.offNamed(
-                    RouteHelper.getNotificationRoute(fromNotification: true));
-              } else {
-                Get.offNamed(RouteHelper.getChatRoute(
-                    notificationBody: widget.body,
-                    conversationId: widget.body.conversationId,
-                    fromNotification: true));
-              }
+            if (widget.body.notificationType == NotificationType.order) {
+              Get.offNamed(RouteHelper.getOrderDetailsRoute(
+                  widget.body.orderId ?? 0,
+                  fromNotification: true));
+            } else if (widget.body.notificationType ==
+                NotificationType.general) {
+              Get.offNamed(
+                  RouteHelper.getNotificationRoute(fromNotification: true));
             } else {
-              if (Get.find<AuthController>().isLoggedIn()) {
-                Get.find<AuthController>().updateToken();
-                await Get.find<AuthController>().getProfile();
-                Get.offNamed(RouteHelper.getInitialRoute());
-              } else {
-                if (AppConstants.languages.length > 1 &&
-                    Get.find<SplashController>().showIntro()) {
-                  Get.offNamed(RouteHelper.getLanguageRoute('splash'));
-                } else {
-                  Get.offNamed(RouteHelper.getSignInRoute());
-                }
-              }
+              Get.offNamed(RouteHelper.getChatRoute(
+                  notificationBody: widget.body,
+                  conversationId: widget.body.conversationId ?? 0,
+                  fromNotification: true));
             }
           }
         });

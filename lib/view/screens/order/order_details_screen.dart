@@ -43,7 +43,7 @@ class OrderDetailsScreen extends StatefulWidget {
 
 class _OrderDetailsScreenState extends State<OrderDetailsScreen>
     with WidgetsBindingObserver {
-  Timer _timer;
+  Timer? _timer;
 
   void _startApiCalling() {
     _timer = Timer.periodic(Duration(seconds: 10), (timer) {
@@ -67,7 +67,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
     if (state == AppLifecycleState.resumed) {
       _startApiCalling();
     } else if (state == AppLifecycleState.paused) {
-      _timer.cancel();
+      _timer?.cancel();
     }
   }
 
@@ -77,16 +77,19 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
 
     WidgetsBinding.instance.removeObserver(this);
 
-    _timer.cancel();
+    _timer?.cancel();
   }
 
   @override
   Widget build(BuildContext context) {
     bool _cancelPermission =
-        Get.find<SplashController>().configModel.canceledByStore;
-    bool _selfDelivery =
-        Get.find<AuthController>().profileModel.stores[0].selfDeliverySystem ==
-            1;
+        (Get.find<SplashController>().configModel.canceledByStore ?? false);
+    bool _selfDelivery = Get.find<AuthController>()
+            .profileModel
+            .stores
+            ?.first
+            .selfDeliverySystem ==
+        1;
 
     return WillPopScope(
       onWillPop: () async {
@@ -141,22 +144,20 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
           double _addOns = 0;
           double _dmTips = 0;
           OrderModel _order = _controllerOrderModer;
-          if (_order != null && orderController.orderDetailsModel != null) {
-            if (_order.orderType == 'delivery') {
-              _deliveryCharge = _order.deliveryCharge;
-              _dmTips = _order.dmTips;
+          if (_order.orderType == 'delivery') {
+            _deliveryCharge = _order.deliveryCharge ?? 0;
+            _dmTips = _order.dmTips ?? 0;
+          }
+          _discount = _order.storeDiscountAmount ?? 0;
+          _tax = _order.totalTaxAmount ?? 0;
+          _couponDiscount = _order.couponDiscountAmount ?? 0;
+          for (OrderDetailsModel orderDetails
+              in orderController.orderDetailsModel) {
+            for (AddOn addOn in (orderDetails.addOns ?? [])) {
+              _addOns = _addOns + ((addOn.price ?? 0) * (addOn.quantity ?? 0));
             }
-            _discount = _order.storeDiscountAmount;
-            _tax = _order.totalTaxAmount;
-            _couponDiscount = _order.couponDiscountAmount;
-            for (OrderDetailsModel orderDetails
-                in orderController.orderDetailsModel) {
-              for (AddOn addOn in orderDetails.addOns) {
-                _addOns = _addOns + (addOn.price * addOn.quantity);
-              }
-              _itemsPrice =
-                  _itemsPrice + (orderDetails.price * orderDetails.quantity);
-            }
+            _itemsPrice = _itemsPrice +
+                ((orderDetails.price ?? 0) * (orderDetails.quantity ?? 0));
           }
           double _subTotal = _itemsPrice + _addOns;
           double _total = _itemsPrice +
@@ -167,8 +168,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
               _couponDiscount +
               _dmTips;
 
-          return (orderController.orderDetailsModel != null &&
-                  _controllerOrderModer != null)
+          return (_controllerOrderModer != null)
               ? Column(children: [
                   Expanded(
                       child: Scrollbar(
@@ -199,7 +199,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                             .PADDING_SIZE_EXTRA_SMALL),
                                     Text(
                                       DateConverter.dateTimeStringToDateTime(
-                                          _order.createdAt),
+                                          _order.createdAt.toString()),
                                       style: robotoRegular,
                                     ),
                                   ]),
@@ -216,7 +216,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                           Text(
                                               DateConverter
                                                   .dateTimeStringToDateTime(
-                                                      _order.scheduleAt),
+                                                      _order.scheduleAt
+                                                          .toString()),
                                               style: robotoMedium),
                                         ])
                                       : SizedBox(),
@@ -226,7 +227,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                           : 0),
 
                                   Row(children: [
-                                    Text(_order.orderType.tr,
+                                    Text(_order.orderType.toString().tr,
                                         style: robotoMedium),
                                     Expanded(child: SizedBox()),
                                     Container(
@@ -286,8 +287,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                               .PADDING_SIZE_EXTRA_SMALL),
                                       Text(
                                         _order.orderStatus == 'delivered'
-                                            ? '${'delivered_at'.tr} ${_order.delivered != null ? DateConverter.dateTimeStringToDateTime(_order.delivered) : ''}'
-                                            : _order.orderStatus.tr,
+                                            ? '${'delivered_at'.tr} ${_order.delivered != null ? DateConverter.dateTimeStringToDateTime(_order.delivered ?? '') : ''}'
+                                            : _order.orderStatus.toString().tr,
                                         style: robotoRegular.copyWith(
                                             fontSize:
                                                 Dimensions.FONT_SIZE_SMALL),
@@ -313,7 +314,9 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                   ),
 
                                   (_order.orderNote != null &&
-                                          _order.orderNote.isNotEmpty)
+                                          _order.orderNote
+                                              .toString()
+                                              .isNotEmpty)
                                       ? Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
@@ -339,7 +342,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                                           .disabledColor),
                                                 ),
                                                 child: Text(
-                                                  _order.orderNote,
+                                                  _order.orderNote.toString(),
                                                   style: robotoRegular.copyWith(
                                                       fontSize: Dimensions
                                                           .FONT_SIZE_SMALL,
@@ -353,11 +356,15 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                             ])
                                       : SizedBox(),
 
-                                  (Get.find<SplashController>()
-                                              .getModule(_order.moduleType)
-                                              .orderAttachment &&
+                                  ((Get.find<SplashController>()
+                                                  .getModule(
+                                                      _order.moduleType ?? '')
+                                                  .orderAttachment ??
+                                              false) &&
                                           _order.orderAttachment != null &&
-                                          _order.orderAttachment.isNotEmpty)
+                                          _order.orderAttachment
+                                              .toString()
+                                              .isNotEmpty)
                                       ? Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
@@ -369,7 +376,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                                       .PADDING_SIZE_SMALL),
                                               InkWell(
                                                 onTap: () => openDialog(context,
-                                                    '${Get.find<SplashController>().configModel.baseUrls.orderAttachmentUrl}/${_order.orderAttachment}'),
+                                                    '${Get.find<SplashController>().configModel.baseUrls?.orderAttachmentUrl}/${_order.orderAttachment}'),
                                                 child: Center(
                                                     child: ClipRRect(
                                                   borderRadius:
@@ -378,7 +385,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                                               .RADIUS_SMALL),
                                                   child: CustomImage(
                                                     image:
-                                                        '${Get.find<SplashController>().configModel.baseUrls.orderAttachmentUrl}/${_order.orderAttachment}',
+                                                        '${Get.find<SplashController>().configModel.baseUrls?.orderAttachmentUrl}/${_order.orderAttachment}',
                                                     width: 200,
                                                   ),
                                                 )),
@@ -403,7 +410,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                             child: ClipOval(
                                                 child: CustomImage(
                                               image:
-                                                  '${Get.find<SplashController>().configModel.baseUrls.customerImageUrl}/${_order.customer != null ? _order.customer.image : ''}',
+                                                  '${Get.find<SplashController>().configModel.baseUrls?.customerImageUrl}/${_order.customer != null ? _order.customer?.image : ''}',
                                               height: 35,
                                               width: 35,
                                               fit: BoxFit.cover,
@@ -418,8 +425,9 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                                       CrossAxisAlignment.start,
                                                   children: [
                                                 Text(
-                                                  _order.deliveryAddress
-                                                      .contactPersonName,
+                                                  (_order.deliveryAddress
+                                                          ?.contactPersonName)
+                                                      .toString(),
                                                   maxLines: 1,
                                                   overflow:
                                                       TextOverflow.ellipsis,
@@ -428,8 +436,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                                           .FONT_SIZE_SMALL),
                                                 ),
                                                 Text(
-                                                  _order.deliveryAddress
-                                                          .address ??
+                                                  (_order.deliveryAddress
+                                                          ?.address) ??
                                                       '',
                                                   maxLines: 1,
                                                   overflow:
@@ -441,19 +449,16 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                                           .disabledColor),
                                                 ),
                                                 Wrap(children: [
-                                                  (_order.deliveryAddress
-                                                                  .streetNumber !=
-                                                              null &&
-                                                          _order
-                                                              .deliveryAddress
-                                                              .streetNumber
-                                                              .isNotEmpty)
+                                                  ((_order.deliveryAddress
+                                                              ?.streetNumber)
+                                                          .toString()
+                                                          .isNotEmpty)
                                                       ? Text(
                                                           'street_number'.tr +
                                                               ': ' +
-                                                              _order
-                                                                  .deliveryAddress
-                                                                  .streetNumber +
+                                                              (_order.deliveryAddress
+                                                                      ?.streetNumber)
+                                                                  .toString() +
                                                               ', ',
                                                           style: robotoRegular.copyWith(
                                                               fontSize: Dimensions
@@ -466,17 +471,19 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                                               .ellipsis,
                                                         )
                                                       : SizedBox(),
-                                                  (_order.deliveryAddress
-                                                                  .house !=
+                                                  ((_order.deliveryAddress
+                                                                  ?.house) !=
                                                               null &&
-                                                          _order.deliveryAddress
-                                                              .house.isNotEmpty)
+                                                          (_order.deliveryAddress
+                                                                  ?.house)
+                                                              .toString()
+                                                              .isNotEmpty)
                                                       ? Text(
                                                           'house'.tr +
                                                               ': ' +
-                                                              _order
-                                                                  .deliveryAddress
-                                                                  .house +
+                                                              (_order.deliveryAddress
+                                                                      ?.house)
+                                                                  .toString() +
                                                               ', ',
                                                           style: robotoRegular.copyWith(
                                                               fontSize: Dimensions
@@ -490,16 +497,18 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                                         )
                                                       : SizedBox(),
                                                   (_order.deliveryAddress
-                                                                  .floor !=
+                                                                  ?.floor !=
                                                               null &&
-                                                          _order.deliveryAddress
-                                                              .floor.isNotEmpty)
+                                                          (_order.deliveryAddress
+                                                                  ?.floor)
+                                                              .toString()
+                                                              .isNotEmpty)
                                                       ? Text(
                                                           'floor'.tr +
                                                               ': ' +
-                                                              _order
-                                                                  .deliveryAddress
-                                                                  .floor,
+                                                              (_order.deliveryAddress
+                                                                      ?.floor)
+                                                                  .toString(),
                                                           style: robotoRegular.copyWith(
                                                               fontSize: Dimensions
                                                                   .FONT_SIZE_EXTRA_SMALL,
@@ -523,8 +532,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                               ? TextButton.icon(
                                                   onPressed: () async {
                                                     String url =
-                                                        'https://www.google.com/maps/dir/?api=1&destination=${_order.deliveryAddress.latitude}'
-                                                        ',${_order.deliveryAddress.longitude}&mode=d';
+                                                        'https://www.google.com/maps/dir/?api=1&destination=${_order.deliveryAddress?.latitude}'
+                                                        ',${_order.deliveryAddress?.longitude}&mode=d';
                                                     if (await canLaunchUrlString(
                                                         url)) {
                                                       await launchUrlString(url,
@@ -559,16 +568,16 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                                           NotificationBody(
                                                         orderId: _order.id,
                                                         customerId:
-                                                            _order.customer.id,
+                                                            _order.customer?.id,
                                                       ),
                                                       user: User(
-                                                        id: _order.customer.id,
+                                                        id: _order.customer?.id,
                                                         fName: _order
-                                                            .customer.fName,
+                                                            .customer?.fName,
                                                         lName: _order
-                                                            .customer.lName,
+                                                            .customer?.lName,
                                                         image: _order
-                                                            .customer.image,
+                                                            .customer?.image,
                                                       ),
                                                     ));
                                                   },
@@ -608,7 +617,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                                     child: CustomImage(
                                                   image: _order.deliveryMan !=
                                                           null
-                                                      ? '${Get.find<SplashController>().configModel.baseUrls.deliveryManImageUrl}/${_order.deliveryMan.image}'
+                                                      ? '${Get.find<SplashController>().configModel.baseUrls?.deliveryManImageUrl}/${_order.deliveryMan?.image}'
                                                       : '',
                                                   height: 35,
                                                   width: 35,
@@ -624,7 +633,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                                                 .start,
                                                         children: [
                                                       Text(
-                                                        '${_order.deliveryMan.fName} ${_order.deliveryMan.lName}',
+                                                        '${_order.deliveryMan?.fName} ${_order.deliveryMan?.lName}',
                                                         maxLines: 1,
                                                         overflow: TextOverflow
                                                             .ellipsis,
@@ -633,8 +642,9 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                                                 .FONT_SIZE_SMALL),
                                                       ),
                                                       Text(
-                                                        _order
-                                                            .deliveryMan.email,
+                                                        (_order.deliveryMan
+                                                                ?.email) ??
+                                                            '',
                                                         maxLines: 1,
                                                         overflow: TextOverflow
                                                             .ellipsis,
@@ -661,14 +671,14 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                                     ? TextButton.icon(
                                                         onPressed: () async {
                                                           if (await canLaunchUrlString(
-                                                              'tel:${_order.deliveryMan.phone != null ? _order.deliveryMan.phone : ''}')) {
+                                                              'tel:${_order.deliveryMan?.phone != null ? _order.deliveryMan?.phone : ''}')) {
                                                             launchUrlString(
-                                                                'tel:${_order.deliveryMan.phone != null ? _order.deliveryMan.phone : ''}',
+                                                                'tel:${_order.deliveryMan?.phone != null ? _order.deliveryMan?.phone : ''}',
                                                                 mode: LaunchMode
                                                                     .externalApplication);
                                                           } else {
                                                             showCustomSnackBar(
-                                                                '${'can_not_launch'.tr} ${_order.deliveryMan.phone != null ? _order.deliveryMan.phone : ''}');
+                                                                '${'can_not_launch'.tr} ${_order.deliveryMan?.phone != null ? _order.deliveryMan?.phone : ''}');
                                                           }
                                                         },
                                                         icon: Icon(Icons.call,
@@ -701,7 +711,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                                             'refunded')
                                                     ? TextButton.icon(
                                                         onPressed: () async {
-                                                          _timer.cancel();
+                                                          _timer?.cancel();
                                                           await Get.toNamed(
                                                               RouteHelper
                                                                   .getChatRoute(
@@ -713,24 +723,24 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                                               deliveryManId:
                                                                   _order
                                                                       .deliveryMan
-                                                                      .id,
+                                                                      ?.id,
                                                             ),
                                                             user: User(
                                                               id: _controllerOrderModer
                                                                   .deliveryMan
-                                                                  .id,
+                                                                  ?.id,
                                                               fName:
                                                                   _controllerOrderModer
                                                                       .deliveryMan
-                                                                      .fName,
+                                                                      ?.fName,
                                                               lName:
                                                                   _controllerOrderModer
                                                                       .deliveryMan
-                                                                      .lName,
+                                                                      ?.lName,
                                                               image:
                                                                   _controllerOrderModer
                                                                       .deliveryMan
-                                                                      .image,
+                                                                      ?.image,
                                                             ),
                                                           ));
                                                           _startApiCalling();
@@ -774,9 +784,11 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                       ]),
                                   SizedBox(height: 10),
 
-                                  Get.find<SplashController>()
-                                          .getModule(_order.moduleType)
-                                          .addOn
+                                  (Get.find<SplashController>()
+                                              .getModule(
+                                                  _order.moduleType.toString())
+                                              .addOn ??
+                                          false)
                                       ? Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
@@ -790,9 +802,11 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                         )
                                       : SizedBox(),
 
-                                  Get.find<SplashController>()
-                                          .getModule(_order.moduleType)
-                                          .addOn
+                                  (Get.find<SplashController>()
+                                              .getModule(
+                                                  _order.moduleType.toString())
+                                              .addOn ??
+                                          false)
                                       ? Divider(
                                           thickness: 1,
                                           color: Theme.of(context)
@@ -801,9 +815,11 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                         )
                                       : SizedBox(),
 
-                                  Get.find<SplashController>()
-                                          .getModule(_order.moduleType)
-                                          .addOn
+                                  (Get.find<SplashController>()
+                                              .getModule(
+                                                  _order.moduleType.toString())
+                                              .addOn ??
+                                          false)
                                       ? Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
@@ -818,9 +834,11 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                         )
                                       : SizedBox(),
                                   SizedBox(
-                                      height: Get.find<SplashController>()
-                                              .getModule(_order.moduleType)
-                                              .addOn
+                                      height: (Get.find<SplashController>()
+                                                  .getModule(_order.moduleType
+                                                      .toString())
+                                                  .addOn ??
+                                              false)
                                           ? 10
                                           : 0),
 
@@ -974,20 +992,23 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                                   BorderRadius.circular(
                                                       Dimensions.RADIUS_SMALL),
                                               side: BorderSide(
-                                                  width: 1,
-                                                  color: Theme.of(context)
-                                                      .textTheme
-                                                      .bodyText1
-                                                      .color),
+                                                width: 1,
+                                                color: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyLarge
+                                                        ?.color ??
+                                                    Colors.red,
+                                              ),
                                             ),
                                           ),
                                           child: Text('cancel'.tr,
                                               textAlign: TextAlign.center,
                                               style: robotoRegular.copyWith(
                                                 color: Theme.of(context)
-                                                    .textTheme
-                                                    .bodyText1
-                                                    .color,
+                                                        .textTheme
+                                                        .bodyLarge
+                                                        ?.color ??
+                                                    Colors.red,
                                                 fontSize:
                                                     Dimensions.FONT_SIZE_LARGE,
                                               )),
@@ -1080,7 +1101,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                               'accepted & confirm call----------------');
                                           Get.find<OrderController>()
                                               .updateOrderStatus(
-                                                  _controllerOrderModer.id,
+                                                  _controllerOrderModer.id ?? 0,
                                                   AppConstants.PROCESSING);
                                         } else if ((_controllerOrderModer
                                                     .orderStatus ==
@@ -1088,23 +1109,27 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                             (_controllerOrderModer.orderType ==
                                                     'take_away' ||
                                                 _selfDelivery))) {
-                                          if (Get.find<SplashController>()
-                                                  .configModel
-                                                  .orderDeliveryVerification ||
+                                          if ((Get.find<SplashController>()
+                                                      .configModel
+                                                      .orderDeliveryVerification ??
+                                                  false) ||
                                               _controllerOrderModer
                                                       .paymentMethod ==
                                                   'cash_on_delivery') {
                                             Get.bottomSheet(
                                                 VerifyDeliverySheet(
-                                                  orderID:
-                                                      _controllerOrderModer.id,
-                                                  verify: Get.find<
-                                                          SplashController>()
-                                                      .configModel
-                                                      .orderDeliveryVerification,
+                                                  orderID: _controllerOrderModer
+                                                          .id ??
+                                                      0,
+                                                  verify: (Get.find<
+                                                              SplashController>()
+                                                          .configModel
+                                                          .orderDeliveryVerification ??
+                                                      false),
                                                   orderAmount:
-                                                      _controllerOrderModer
-                                                          .orderAmount,
+                                                      (_controllerOrderModer
+                                                              .orderAmount ??
+                                                          0),
                                                   cod: _controllerOrderModer
                                                           .paymentMethod ==
                                                       'cash_on_delivery',
@@ -1113,7 +1138,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                           } else {
                                             Get.find<OrderController>()
                                                 .updateOrderStatus(
-                                                    _controllerOrderModer.id,
+                                                    _controllerOrderModer.id ??
+                                                        0,
                                                     AppConstants.DELIVERED);
                                           }
                                         }
@@ -1136,11 +1162,12 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                                                         _controllerOrderModer
                                                                 .confirmed !=
                                                             null))
-                                                ? Get.find<SplashController>()
-                                                        .configModel
-                                                        .moduleConfig
-                                                        .module
-                                                        .showRestaurantText
+                                                ? (Get.find<SplashController>()
+                                                            .configModel
+                                                            .moduleConfig
+                                                            ?.module
+                                                            ?.showRestaurantText ??
+                                                        false)
                                                     ? 'swipe_to_cooking'.tr
                                                     : 'swipe_to_process'.tr
                                                 : (_controllerOrderModer

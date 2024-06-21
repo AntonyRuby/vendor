@@ -4,7 +4,7 @@ import 'package:vibration/vibration.dart';
 
 class SliderButton extends StatefulWidget {
   ///To make button more customizable add your child widget
-  final Widget child;
+  final Widget? child;
 
   ///Sets the radius of corners of a button.
   final double radius;
@@ -21,7 +21,7 @@ class SliderButton extends StatefulWidget {
   final Color buttonColor;
 
   ///Change it to gave a label on a widget of your choice.
-  final Text label;
+  final Text? label;
 
   ///Gives a alignment to a slidder icon.
   final Alignment alignLabel;
@@ -52,7 +52,7 @@ class SliderButton extends StatefulWidget {
       blurRadius: 4,
     ),
     this.child,
-    this.isLtr,
+    this.isLtr = false,
     this.vibrationFlag = true,
     this.shimmer = true,
     this.height = 70,
@@ -80,14 +80,14 @@ class SliderButton extends StatefulWidget {
 }
 
 class _SliderButtonState extends State<SliderButton> {
-  bool flag;
-  Widget _child;
+  bool flag = false;
+  Widget _child = SizedBox();
 
   @override
   void initState() {
     super.initState();
     flag = true;
-    _child = widget.child;
+    _child = widget.child ?? SizedBox();
   }
 
   @override
@@ -117,7 +117,7 @@ class _SliderButtonState extends State<SliderButton> {
               child: widget.shimmer && !widget.disable
                   ? Shimmer(
                       color: widget.highlightedColor,
-                      child: widget.label,
+                      child: widget.label ?? SizedBox(),
                     )
                   : widget.label,
             ),
@@ -168,7 +168,7 @@ class _SliderButtonState extends State<SliderButton> {
 
                       widget.action();
                       if (widget.vibrationFlag &&
-                          await Vibration.hasVibrator()) {
+                          (await Vibration.hasVibrator() ?? false)) {
                         try {
                           Vibration.vibrate(duration: 200);
                         } catch (e) {

@@ -7,8 +7,8 @@ import 'package:get/get.dart';
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final bool isBackButtonExist;
-  final Widget menuWidget;
-  final Function onTap;
+  final Widget? menuWidget;
+  final Function? onTap;
   CustomAppBar(
       {required this.title,
       this.isBackButtonExist = true,
@@ -21,18 +21,20 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: Text(title,
           style: robotoRegular.copyWith(
               fontSize: Dimensions.FONT_SIZE_LARGE,
-              color: Theme.of(context).textTheme.bodyText1.color)),
+              color: Theme.of(context).textTheme.bodyLarge?.color)),
       centerTitle: true,
       leading: isBackButtonExist
           ? IconButton(
               icon: Icon(Icons.arrow_back_ios),
-              color: Theme.of(context).textTheme.bodyText1.color,
-              onPressed: onTap ?? () => Get.back(),
+              color: Theme.of(context).textTheme.bodyLarge?.color,
+              onPressed: () {
+                onTap ?? () => Get.back();
+              },
             )
           : SizedBox(),
       backgroundColor: Theme.of(context).cardColor,
       elevation: 0,
-      actions: menuWidget != null ? [menuWidget] : null,
+      actions: menuWidget != null ? [menuWidget ?? SizedBox()] : null,
     );
   }
 

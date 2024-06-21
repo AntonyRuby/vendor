@@ -41,7 +41,7 @@ class HomeScreen extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: robotoMedium.copyWith(
-              color: Theme.of(context).textTheme.bodyText1.color,
+              color: Theme.of(context).textTheme.bodyLarge?.color,
               fontSize: Dimensions.FONT_SIZE_DEFAULT,
             )),
         actions: [
@@ -52,7 +52,7 @@ class HomeScreen extends StatelessWidget {
               return Stack(children: [
                 Icon(Icons.notifications,
                     size: 25,
-                    color: Theme.of(context).textTheme.bodyText1.color),
+                    color: Theme.of(context).textTheme.bodyLarge?.color),
                 notificationController.hasNotification
                     ? Positioned(
                         top: 0,
@@ -70,7 +70,8 @@ class HomeScreen extends StatelessWidget {
                     : SizedBox(),
               ]);
             }),
-            onPressed: () => Get.toNamed(RouteHelper.getNotificationRoute()),
+            onPressed: () => Get.toNamed(
+                RouteHelper.getNotificationRoute(fromNotification: false)),
           )
         ],
       ),
@@ -92,7 +93,8 @@ class HomeScreen extends StatelessWidget {
                     color: Theme.of(context).cardColor,
                     boxShadow: [
                       BoxShadow(
-                          color: Colors.grey[Get.isDarkMode ? 700 : 200],
+                          color: Colors.grey[Get.isDarkMode ? 700 : 200] ??
+                              Colors.red,
                           spreadRadius: 1,
                           blurRadius: 5)
                     ],
@@ -101,10 +103,11 @@ class HomeScreen extends StatelessWidget {
                     Expanded(
                         child: Text(
                       Get.find<SplashController>()
-                              .configModel
-                              .moduleConfig
-                              .module
-                              .showRestaurantText
+                                  .configModel
+                                  .moduleConfig
+                                  ?.module
+                                  ?.showRestaurantText ??
+                              false
                           ? 'restaurant_temporarily_closed'.tr
                           : 'store_temporarily_closed'.tr,
                       style: robotoMedium,
@@ -113,18 +116,20 @@ class HomeScreen extends StatelessWidget {
                     )),
                     authController.profileModel != null
                         ? Switch(
-                            value:
-                                !authController.profileModel.stores[0].active,
+                            value: !(authController
+                                    .profileModel.stores?.first.active ??
+                                false),
                             activeColor: Theme.of(context).primaryColor,
                             materialTapTargetSize:
                                 MaterialTapTargetSize.shrinkWrap,
                             onChanged: (bool isActive) {
                               bool _showRestaurantText =
                                   Get.find<SplashController>()
-                                      .configModel
-                                      .moduleConfig
-                                      .module
-                                      .showRestaurantText;
+                                          .configModel
+                                          .moduleConfig
+                                          ?.module
+                                          ?.showRestaurantText ??
+                                      false;
                               Get.dialog(ConfirmationDialog(
                                 icon: Images.warning,
                                 description: isActive
@@ -234,10 +239,8 @@ class HomeScreen extends StatelessWidget {
             SizedBox(height: Dimensions.PADDING_SIZE_LARGE),
             GetBuilder<OrderController>(builder: (orderController) {
               List<OrderModel> _orderList = [];
-              if (orderController.runningOrders != null) {
-                _orderList = orderController
-                    .runningOrders[orderController.orderIndex].orderList;
-              }
+              _orderList = orderController
+                  .runningOrders[orderController.orderIndex].orderList;
 
               return Column(children: [
                 orderController.runningOrders != null
@@ -254,8 +257,10 @@ class HomeScreen extends StatelessWidget {
                           itemCount: orderController.runningOrders.length,
                           itemBuilder: (context, index) {
                             return OrderButton(
-                              title: orderController
-                                  .runningOrders[index].status.tr,
+                              title:
+                                  (orderController.runningOrders[index].status)
+                                      .toString()
+                                      .tr,
                               index: index,
                               orderController: orderController,
                               fromHistory: false,

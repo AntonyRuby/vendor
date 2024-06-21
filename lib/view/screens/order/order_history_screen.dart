@@ -31,15 +31,18 @@ class OrderHistoryScreen extends StatelessWidget {
                         CountWidget(
                             title: 'today'.tr,
                             count:
-                                authController.profileModel.todaysOrderCount),
+                                authController.profileModel.todaysOrderCount ??
+                                    0),
                         CountWidget(
                             title: 'this_week'.tr,
-                            count:
-                                authController.profileModel.thisWeekOrderCount),
+                            count: authController
+                                    .profileModel.thisWeekOrderCount ??
+                                0),
                         CountWidget(
                             title: 'this_month'.tr,
                             count: authController
-                                .profileModel.thisMonthOrderCount),
+                                    .profileModel.thisMonthOrderCount ??
+                                0),
                       ]),
                     )
                   : SizedBox();

@@ -39,17 +39,18 @@ class _AddItemScreenState extends State<AddItemScreen> {
   final FocusNode _priceNode = FocusNode();
   final FocusNode _discountNode = FocusNode();
   bool _update = false;
-  Item _item;
-  Module _module = Get.find<SplashController>().configModel.moduleConfig.module;
+  Item _item = Item();
+  Module _module =
+      Get.find<SplashController>().configModel.moduleConfig?.module ?? Module();
 
   @override
   void initState() {
     super.initState();
 
     _update = widget.item != null;
-    Get.find<StoreController>().getAttributeList(widget.item);
+    Get.find<StoreController>().getAttributeList(widget.item ?? Item());
     if (_update) {
-      _item = Item.fromJson(widget.item.toJson());
+      _item = Item.fromJson((widget.item ?? Item()).toJson());
       _priceController.text = _item.price.toString();
       _discountController.text = _item.discount.toString();
       _stockController.text = _item.stock.toString();
@@ -71,24 +72,27 @@ class _AddItemScreenState extends State<AddItemScreen> {
       body: GetBuilder<StoreController>(builder: (storeController) {
         List<String> _unitList = [];
         for (int index = 0; index < storeController.unitList.length; index++) {
-          _unitList.add(storeController.unitList[index].unit);
+          _unitList.add(storeController.unitList[index].unit.toString());
         }
 
         List<String> _categoryList = [];
         for (int index = 0;
             index < storeController.categoryList.length;
             index++) {
-          _categoryList.add(storeController.categoryList[index].name);
+          _categoryList
+              .add(storeController.categoryList[index].name.toString());
         }
 
         List<String> _subCategory = [];
         for (int index = 0;
             index < storeController.subCategoryList.length;
             index++) {
-          _subCategory.add(storeController.subCategoryList[index].name);
+          _subCategory
+              .add(storeController.subCategoryList[index].name.toString());
         }
 
-        if (_module.stock && storeController.variantTypeList.length > 0) {
+        if ((_module.stock ?? false) &&
+            storeController.variantTypeList.length > 0) {
           _stockController.text = storeController.totalStock.toString();
         }
 
@@ -144,8 +148,9 @@ class _AddItemScreenState extends State<AddItemScreen> {
                                         Dimensions.RADIUS_SMALL),
                                     boxShadow: [
                                       BoxShadow(
-                                          color: Colors
-                                              .grey[Get.isDarkMode ? 800 : 200],
+                                          color: Colors.grey[
+                                                  Get.isDarkMode ? 800 : 200] ??
+                                              Colors.red,
                                           spreadRadius: 2,
                                           blurRadius: 5,
                                           offset: Offset(0, 5))
@@ -174,10 +179,11 @@ class _AddItemScreenState extends State<AddItemScreen> {
                               ])),
                         ]),
                         SizedBox(height: Dimensions.PADDING_SIZE_LARGE),
-                        (_module.vegNonVeg &&
-                                Get.find<SplashController>()
-                                    .configModel
-                                    .toggleVegNonVeg)
+                        ((_module.vegNonVeg ?? false) &&
+                                (Get.find<SplashController>()
+                                        .configModel
+                                        .toggleVegNonVeg ??
+                                    false))
                             ? Align(
                                 alignment: Alignment.centerLeft,
                                 child: Text(
@@ -187,10 +193,11 @@ class _AddItemScreenState extends State<AddItemScreen> {
                                       color: Theme.of(context).disabledColor),
                                 ))
                             : SizedBox(),
-                        (_module.vegNonVeg &&
-                                Get.find<SplashController>()
-                                    .configModel
-                                    .toggleVegNonVeg)
+                        ((_module.vegNonVeg ?? false) &&
+                                (Get.find<SplashController>()
+                                        .configModel
+                                        .toggleVegNonVeg ??
+                                    false))
                             ? Row(children: [
                                 Expanded(
                                     child: RadioListTile<String>(
@@ -203,7 +210,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                                       storeController.isVeg ? 'veg' : 'non_veg',
                                   value: 'non_veg',
                                   contentPadding: EdgeInsets.zero,
-                                  onChanged: (String value) => storeController
+                                  onChanged: (String? value) => storeController
                                       .setVeg(value == 'veg', true),
                                   activeColor: Theme.of(context).primaryColor,
                                 )),
@@ -219,7 +226,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                                       storeController.isVeg ? 'veg' : 'non_veg',
                                   value: 'veg',
                                   contentPadding: EdgeInsets.zero,
-                                  onChanged: (String value) => storeController
+                                  onChanged: (String? value) => storeController
                                       .setVeg(value == 'veg', true),
                                   activeColor: Theme.of(context).primaryColor,
                                   dense: false,
@@ -227,10 +234,11 @@ class _AddItemScreenState extends State<AddItemScreen> {
                               ])
                             : SizedBox(),
                         SizedBox(
-                            height: (_module.vegNonVeg &&
-                                    Get.find<SplashController>()
-                                        .configModel
-                                        .toggleVegNonVeg)
+                            height: ((_module.vegNonVeg ?? false) &&
+                                    (Get.find<SplashController>()
+                                            .configModel
+                                            .toggleVegNonVeg ??
+                                        false))
                                 ? Dimensions.PADDING_SIZE_LARGE
                                 : 0),
                         Row(children: [
@@ -245,7 +253,9 @@ class _AddItemScreenState extends State<AddItemScreen> {
                               if (value != '0') {
                                 storeController.getSubCategoryList(
                                     storeController
-                                        .categoryList[int.parse(value) - 1].id,
+                                            .categoryList[int.parse(value) - 1]
+                                            .id ??
+                                        0,
                                     null);
                               }
                             },
@@ -263,10 +273,10 @@ class _AddItemScreenState extends State<AddItemScreen> {
                         SizedBox(height: Dimensions.PADDING_SIZE_LARGE),
                         AttributeView(
                             storeController: storeController,
-                            product: widget.item),
-                        (_module.stock || _module.unit)
+                            product: widget.item ?? Item()),
+                        ((_module.stock ?? false) || (_module.unit ?? false))
                             ? Row(children: [
-                                _module.stock
+                                (_module.stock ?? false)
                                     ? Expanded(
                                         child: MyTextField(
                                         hintText: 'total_stock'.tr,
@@ -278,10 +288,10 @@ class _AddItemScreenState extends State<AddItemScreen> {
                                       ))
                                     : SizedBox(),
                                 SizedBox(
-                                    width: _module.stock
+                                    width: (_module.stock ?? false)
                                         ? Dimensions.PADDING_SIZE_SMALL
                                         : 0),
-                                _module.unit
+                                (_module.unit ?? false)
                                     ? Expanded(
                                         child: CustomDropDown(
                                         value: storeController.unitIndex
@@ -296,10 +306,11 @@ class _AddItemScreenState extends State<AddItemScreen> {
                               ])
                             : SizedBox(),
                         SizedBox(
-                            height: (_module.stock || _module.unit)
+                            height: ((_module.stock ?? false) ||
+                                    (_module.unit ?? false))
                                 ? Dimensions.PADDING_SIZE_LARGE
                                 : 0),
-                        _module.addOn
+                        (_module.addOn ?? false)
                             ? Text(
                                 'addons'.tr,
                                 style: robotoRegular.copyWith(
@@ -308,10 +319,10 @@ class _AddItemScreenState extends State<AddItemScreen> {
                               )
                             : SizedBox(),
                         SizedBox(
-                            height: _module.addOn
+                            height: (_module.addOn ?? false)
                                 ? Dimensions.PADDING_SIZE_EXTRA_SMALL
                                 : 0),
-                        _module.addOn
+                        (_module.addOn ?? false)
                             ? GetBuilder<AddonController>(
                                 builder: (addonController) {
                                 List<int> _addons = [];
@@ -331,7 +342,9 @@ class _AddItemScreenState extends State<AddItemScreen> {
                                       return Iterable<int>.empty();
                                     } else {
                                       return _addons.where((addon) =>
-                                          addonController.addonList[addon].name
+                                          (addonController
+                                                  .addonList[addon].name)
+                                              .toString()
                                               .toLowerCase()
                                               .contains(
                                                   value.text.toLowerCase()));
@@ -348,8 +361,10 @@ class _AddItemScreenState extends State<AddItemScreen> {
                                             Dimensions.RADIUS_SMALL),
                                         boxShadow: [
                                           BoxShadow(
-                                              color: Colors.grey[
-                                                  Get.isDarkMode ? 800 : 200],
+                                              color: Colors.grey[Get.isDarkMode
+                                                      ? 800
+                                                      : 200] ??
+                                                  Colors.red,
                                               spreadRadius: 2,
                                               blurRadius: 5,
                                               offset: Offset(0, 5))
@@ -374,7 +389,8 @@ class _AddItemScreenState extends State<AddItemScreen> {
                                     );
                                   },
                                   displayStringForOption: (value) =>
-                                      addonController.addonList[value].name,
+                                      (addonController.addonList[value].name)
+                                          .toString(),
                                   onSelected: (int value) {
                                     _c.text = '';
                                     storeController.setSelectedAddonIndex(
@@ -385,11 +401,11 @@ class _AddItemScreenState extends State<AddItemScreen> {
                               })
                             : SizedBox(),
                         SizedBox(
-                            height: (_module.addOn &&
+                            height: ((_module.addOn ?? false) &&
                                     storeController.selectedAddons.length > 0)
                                 ? Dimensions.PADDING_SIZE_SMALL
                                 : 0),
-                        _module.addOn
+                        (_module.addOn ?? false)
                             ? SizedBox(
                                 height:
                                     storeController.selectedAddons.length > 0
@@ -415,10 +431,11 @@ class _AddItemScreenState extends State<AddItemScreen> {
                                         GetBuilder<AddonController>(
                                             builder: (addonController) {
                                           return Text(
-                                            addonController
-                                                .addonList[storeController
-                                                    .selectedAddons[index]]
-                                                .name,
+                                            (addonController
+                                                    .addonList[storeController
+                                                        .selectedAddons[index]]
+                                                    .name) ??
+                                                '',
                                             style: robotoRegular.copyWith(
                                                 color: Theme.of(context)
                                                     .cardColor),
@@ -443,15 +460,15 @@ class _AddItemScreenState extends State<AddItemScreen> {
                               )
                             : SizedBox(),
                         SizedBox(
-                            height: _module.addOn
+                            height: (_module.addOn ?? false)
                                 ? Dimensions.PADDING_SIZE_LARGE
                                 : 0),
-                        _module.itemAvailableTime
+                        (_module.itemAvailableTime ?? false)
                             ? Row(children: [
                                 Expanded(
                                     child: CustomTimePicker(
                                   title: 'available_time_starts'.tr,
-                                  time: _item.availableTimeStarts,
+                                  time: (_item.availableTimeStarts ?? ''),
                                   onTimeChanged: (time) =>
                                       _item.availableTimeStarts = time,
                                 )),
@@ -459,14 +476,14 @@ class _AddItemScreenState extends State<AddItemScreen> {
                                 Expanded(
                                     child: CustomTimePicker(
                                   title: 'available_time_ends'.tr,
-                                  time: _item.availableTimeEnds,
+                                  time: (_item.availableTimeEnds) ?? '',
                                   onTimeChanged: (time) =>
                                       _item.availableTimeEnds = time,
                                 )),
                               ])
                             : SizedBox(),
                         SizedBox(
-                            height: _module.itemAvailableTime
+                            height: (_module.itemAvailableTime) ?? false
                                 ? Dimensions.PADDING_SIZE_LARGE
                                 : 0),
                         Row(children: [
@@ -494,13 +511,15 @@ class _AddItemScreenState extends State<AddItemScreen> {
                                 child: storeController.rawLogo != null
                                     ? GetPlatform.isWeb
                                         ? Image.network(
-                                            storeController.rawLogo.path,
+                                            storeController.rawLogo?.path ?? '',
                                             width: 150,
                                             height: 120,
                                             fit: BoxFit.cover,
                                           )
                                         : Image.file(
-                                            File(storeController.rawLogo.path),
+                                            File(
+                                                storeController.rawLogo?.path ??
+                                                    ''),
                                             width: 120,
                                             height: 120,
                                             fit: BoxFit.cover,
@@ -508,7 +527,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                                     : FadeInImage.assetNetwork(
                                         placeholder: Images.placeholder,
                                         image:
-                                            '${Get.find<SplashController>().configModel.baseUrls.itemImageUrl}/${_item.image != null ? _item.image : ''}',
+                                            '${Get.find<SplashController>().configModel.baseUrls?.itemImageUrl}/${_item.image != null ? _item.image : ''}',
                                         height: 120,
                                         width: 150,
                                         fit: BoxFit.cover,
@@ -584,7 +603,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                           itemBuilder: (context, index) {
                             bool _savedImage =
                                 index < storeController.savedImages.length;
-                            XFile _file = (_savedImage ||
+                            XFile? _file = (_savedImage ||
                                     index ==
                                         (storeController.rawImages.length +
                                             storeController.savedImages.length))
@@ -647,20 +666,20 @@ class _AddItemScreenState extends State<AddItemScreen> {
                                   child: _savedImage
                                       ? CustomImage(
                                           image:
-                                              '${Get.find<SplashController>().configModel.baseUrls.itemImageUrl}/${storeController.savedImages[index]}',
+                                              '${Get.find<SplashController>().configModel.baseUrls?.itemImageUrl}/${storeController.savedImages[index]}',
                                           width: context.width,
                                           height: context.width,
                                           fit: BoxFit.cover,
                                         )
                                       : GetPlatform.isWeb
                                           ? Image.network(
-                                              _file.path,
+                                              _file?.path ?? '',
                                               width: context.width,
                                               height: context.width,
                                               fit: BoxFit.cover,
                                             )
                                           : Image.file(
-                                              File(_file.path),
+                                              File(_file?.path ?? ''),
                                               width: context.width,
                                               height: context.width,
                                               fit: BoxFit.cover,
@@ -705,7 +724,8 @@ class _AddItemScreenState extends State<AddItemScreen> {
                           bool _blankVariantStock = false;
                           for (AttributeModel attr
                               in storeController.attributeList) {
-                            if (attr.active && attr.variants.length == 0) {
+                            if ((attr.active ?? false) &&
+                                attr.variants.length == 0) {
                               _haveBlankVariant = true;
                               break;
                             }
@@ -716,7 +736,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
                               _blankVariantPrice = true;
                               break;
                             }
-                            if (_module.stock &&
+                            if ((_module.stock ?? false) &&
                                 variantType.stockController.text.isEmpty) {
                               _blankVariantStock = true;
                               break;
@@ -735,20 +755,21 @@ class _AddItemScreenState extends State<AddItemScreen> {
                           } else if (_blankVariantPrice) {
                             showCustomSnackBar(
                                 'enter_price_for_every_variant'.tr);
-                          } else if (_module.stock && _blankVariantStock) {
+                          } else if ((_module.stock ?? false) &&
+                              _blankVariantStock) {
                             showCustomSnackBar(
                                 'enter_stock_for_every_variant'.tr);
-                          } else if (_module.stock &&
+                          } else if ((_module.stock ?? false) &&
                               storeController.variantTypeList.length <= 0 &&
                               _stockController.text.trim().isEmpty) {
                             showCustomSnackBar('enter_stock'.tr);
-                          } else if (_module.unit &&
+                          } else if ((_module.unit ?? false) &&
                               storeController.unitIndex == 0) {
                             showCustomSnackBar('add_an_unit'.tr);
-                          } else if (_module.itemAvailableTime &&
+                          } else if ((_module.itemAvailableTime ?? false) &&
                               _item.availableTimeStarts == null) {
                             showCustomSnackBar('pick_start_time'.tr);
-                          } else if (_module.itemAvailableTime &&
+                          } else if ((_module.itemAvailableTime ?? false) &&
                               _item.availableTimeEnds == null) {
                             showCustomSnackBar('pick_end_time'.tr);
                           } else if (!_update &&
@@ -763,40 +784,40 @@ class _AddItemScreenState extends State<AddItemScreen> {
                                     ? 'percent'
                                     : 'amount';
                             _item.categoryIds = [];
-                            _item.categoryIds.add(CategoryIds(
+                            _item.categoryIds?.add(CategoryIds(
                                 id: storeController
                                     .categoryList[
                                         storeController.categoryIndex - 1]
                                     .id
                                     .toString()));
                             if (storeController.subCategoryIndex != 0) {
-                              _item.categoryIds.add(CategoryIds(
+                              _item.categoryIds?.add(CategoryIds(
                                   id: storeController
                                       .subCategoryList[
                                           storeController.subCategoryIndex - 1]
                                       .id
                                       .toString()));
                             } else {
-                              if (_item.categoryIds.length > 1) {
-                                _item.categoryIds.removeAt(1);
+                              if ((_item.categoryIds ?? []).length > 1) {
+                                _item.categoryIds?.removeAt(1);
                               }
                             }
                             _item.addOns = [];
                             storeController.selectedAddons.forEach((index) {
-                              _item.addOns.add(
+                              _item.addOns?.add(
                                   Get.find<AddonController>().addonList[index]);
                             });
-                            if (_module.unit) {
+                            if (_module.unit ?? false) {
                               _item.unitType = storeController
                                   .unitList[storeController.unitIndex - 1].id
                                   .toString();
                             }
-                            if (_module.stock) {
+                            if (_module.stock ?? false) {
                               _item.stock =
                                   int.parse(_stockController.text.trim());
                             }
                             _item.translations = [];
-                            _item.translations.addAll(widget.translations);
+                            _item.translations?.addAll(widget.translations);
                             storeController.addItem(_item, widget.item == null);
                           }
                         },

@@ -8,19 +8,21 @@ import 'package:get/get.dart';
 
 class VegFilterWidget extends StatelessWidget {
   final String type;
-  final Function(String value) onSelected;
+  final Function(String value)? onSelected;
   VegFilterWidget({required this.type, required this.onSelected});
 
   @override
   Widget build(BuildContext context) {
     final bool _ltr = Get.find<LocalizationController>().isLtr;
 
-    return (Get.find<SplashController>().configModel.toggleVegNonVeg &&
-            Get.find<SplashController>()
-                .configModel
-                .moduleConfig
-                .module
-                .vegNonVeg)
+    return ((Get.find<SplashController>().configModel.toggleVegNonVeg ??
+                false) &&
+            (Get.find<SplashController>()
+                    .configModel
+                    .moduleConfig
+                    ?.module
+                    ?.vegNonVeg ??
+                false))
         ? Align(
             alignment: Alignment.center,
             child: Container(
@@ -39,7 +41,7 @@ class VegFilterWidget extends StatelessWidget {
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
                   return InkWell(
-                    onTap: () => onSelected(
+                    onTap: () => onSelected!(
                         Get.find<StoreController>().itemTypeList[index]),
                     child: Container(
                       padding: EdgeInsets.symmetric(

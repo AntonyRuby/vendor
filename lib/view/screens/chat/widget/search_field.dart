@@ -8,8 +8,8 @@ class SearchField extends StatefulWidget {
   final String hint;
   final IconData suffixIcon;
   final Function iconPressed;
-  final Function onSubmit;
-  final Function onChanged;
+  final Function? onSubmit;
+  final Function? onChanged;
   SearchField(
       {required this.controller,
       required this.hint,
@@ -29,7 +29,7 @@ class _SearchFieldState extends State<SearchField> {
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
-              color: Colors.grey[Get.isDarkMode ? 800 : 200],
+              color: Colors.grey[Get.isDarkMode ? 800 : 200] ?? Colors.red,
               spreadRadius: 1,
               blurRadius: 5)
         ],
@@ -49,12 +49,18 @@ class _SearchFieldState extends State<SearchField> {
           fillColor: Theme.of(context).cardColor,
           isDense: true,
           suffixIcon: IconButton(
-            onPressed: widget.iconPressed,
+            onPressed: () {
+              widget.iconPressed();
+            },
             icon: Icon(widget.suffixIcon),
           ),
         ),
-        onSubmitted: widget.onSubmit,
-        onChanged: widget.onChanged,
+        onSubmitted: (String val) {
+          if (widget.onSubmit != null) widget.onSubmit!();
+        },
+        onChanged: (String val) {
+          if (widget.onChanged != null) widget.onChanged!();
+        },
       ),
     );
   }

@@ -113,7 +113,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                           BorderRadius.circular(Dimensions.RADIUS_SMALL),
                       child: storeController.rawLogo != null
                           ? Image.network(
-                              storeController.rawLogo.path,
+                              storeController.rawLogo?.path ?? '',
                               width: 150,
                               height: 120,
                               fit: BoxFit.cover,
@@ -273,8 +273,11 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                   height: _module.orderPlaceToScheduleInterval ?? false
                       ? Dimensions.PADDING_SIZE_LARGE
                       : 0),
-              (_module.vegNonVeg &&
-                      Get.find<SplashController>().configModel.toggleVegNonVeg)
+              ((_module.vegNonVeg ?? false) &&
+                      (Get.find<SplashController>()
+                              .configModel
+                              .toggleVegNonVeg ??
+                          false))
                   ? Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
@@ -284,8 +287,11 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                             color: Theme.of(context).disabledColor),
                       ))
                   : SizedBox(),
-              (_module.vegNonVeg &&
-                      Get.find<SplashController>().configModel.toggleVegNonVeg)
+              ((_module.vegNonVeg ?? false) &&
+                      (Get.find<SplashController>()
+                              .configModel
+                              .toggleVegNonVeg ??
+                          false))
                   ? Row(children: [
                       Expanded(
                           child: InkWell(
@@ -294,8 +300,8 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                         child: Row(children: [
                           Checkbox(
                             value: storeController.isStoreVeg,
-                            onChanged: (bool isActive) =>
-                                storeController.setStoreVeg(isActive, true),
+                            onChanged: (bool? isActive) => storeController
+                                .setStoreVeg(isActive ?? false, true),
                             activeColor: Theme.of(context).primaryColor,
                           ),
                           Text('veg'.tr),
@@ -309,8 +315,8 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                         child: Row(children: [
                           Checkbox(
                             value: storeController.isStoreNonVeg,
-                            onChanged: (bool isActive) =>
-                                storeController.setStoreNonVeg(isActive, true),
+                            onChanged: (bool? isActive) => storeController
+                                .setStoreNonVeg(isActive ?? false, true),
                             activeColor: Theme.of(context).primaryColor,
                           ),
                           Text('non_veg'.tr),
@@ -319,10 +325,11 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                     ])
                   : SizedBox(),
               SizedBox(
-                  height: (_module.vegNonVeg &&
-                          Get.find<SplashController>()
-                              .configModel
-                              .toggleVegNonVeg)
+                  height: ((_module.vegNonVeg ?? false) &&
+                          (Get.find<SplashController>()
+                                  .configModel
+                                  .toggleVegNonVeg ??
+                              false))
                       ? Dimensions.PADDING_SIZE_LARGE
                       : 0),
               Row(children: [
@@ -348,7 +355,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                 isEnabled: storeController.isGstEnabled,
               ),
               SizedBox(height: Dimensions.PADDING_SIZE_LARGE),
-              _module.alwaysOpen
+              (_module.alwaysOpen ?? false)
                   ? SizedBox()
                   : Align(
                       alignment: Alignment.centerLeft,
@@ -359,10 +366,10 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                             color: Theme.of(context).disabledColor),
                       )),
               SizedBox(
-                  height: _module.alwaysOpen
+                  height: (_module.alwaysOpen ?? false)
                       ? 0
                       : Dimensions.PADDING_SIZE_EXTRA_SMALL),
-              _module.alwaysOpen
+              (_module.alwaysOpen ?? false)
                   ? SizedBox()
                   : ListView.builder(
                       physics: NeverScrollableScrollPhysics(),
@@ -373,28 +380,31 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                       },
                     ),
               SizedBox(
-                  height:
-                      _module.alwaysOpen ? 0 : Dimensions.PADDING_SIZE_LARGE),
-              Get.find<SplashController>().configModel.scheduleOrder
+                  height: (_module.alwaysOpen ?? false)
+                      ? 0
+                      : Dimensions.PADDING_SIZE_LARGE),
+              (Get.find<SplashController>().configModel.scheduleOrder ?? false)
                   ? SwitchButton(
                       icon: Icons.alarm_add,
                       title: 'schedule_order'.tr,
                       isButtonActive: widget.store.scheduleOrder,
                       onTap: () {
-                        _store.scheduleOrder = !_store.scheduleOrder;
+                        _store.scheduleOrder = !(_store.scheduleOrder ?? false);
                       },
                     )
                   : SizedBox(),
               SizedBox(
-                  height: Get.find<SplashController>().configModel.scheduleOrder
-                      ? Dimensions.PADDING_SIZE_SMALL
-                      : 0),
+                  height:
+                      (Get.find<SplashController>().configModel.scheduleOrder ??
+                              false)
+                          ? Dimensions.PADDING_SIZE_SMALL
+                          : 0),
               SwitchButton(
                   icon: Icons.delivery_dining,
                   title: 'delivery'.tr,
                   isButtonActive: widget.store.delivery,
                   onTap: () {
-                    _store.delivery = !_store.delivery;
+                    _store.delivery = !(_store.delivery ?? false);
                   }),
               SizedBox(height: Dimensions.PADDING_SIZE_SMALL),
               SwitchButton(
@@ -402,7 +412,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                   title: 'take_away'.tr,
                   isButtonActive: widget.store.takeAway,
                   onTap: () {
-                    _store.takeAway = !_store.takeAway;
+                    _store.takeAway = !(_store.takeAway ?? false);
                   }),
               SizedBox(height: Dimensions.PADDING_SIZE_LARGE),
               Stack(children: [
@@ -410,7 +420,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                   borderRadius: BorderRadius.circular(Dimensions.RADIUS_SMALL),
                   child: storeController.rawCover != null
                       ? Image.network(
-                          storeController.rawCover.path,
+                          (storeController.rawCover?.path ?? ''),
                           width: context.width,
                           height: 170,
                           fit: BoxFit.cover,
@@ -418,7 +428,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                       : FadeInImage.assetNetwork(
                           placeholder: Images.restaurant_cover,
                           image:
-                              '${Get.find<SplashController>().configModel.baseUrls.storeCoverPhotoUrl}/${widget.store.coverPhoto}',
+                              '${Get.find<SplashController>().configModel.baseUrls?.storeCoverPhotoUrl}/${widget.store.coverPhoto}',
                           height: 170,
                           width: context.width,
                           fit: BoxFit.cover,
@@ -473,7 +483,8 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                     String _processingTime =
                         _processingTimeController.text.trim();
                     String _gstCode = _gstController.text.trim();
-                    bool _showRestaurantText = _module.showRestaurantText;
+                    bool _showRestaurantText =
+                        _module.showRestaurantText ?? false;
                     if (_name.isEmpty) {
                       showCustomSnackBar(_showRestaurantText
                           ? 'enter_your_restaurant_name'.tr
@@ -497,13 +508,15 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                       showCustomSnackBar('enter_maximum_delivery_time'.tr);
                     } else if (storeController.durationIndex == 0) {
                       showCustomSnackBar('select_delivery_time_type'.tr);
-                    } else if (_module.orderPlaceToScheduleInterval &&
+                    } else if ((_module.orderPlaceToScheduleInterval ??
+                            false) &&
                         _processingTime.isEmpty) {
                       showCustomSnackBar('enter_minimum_processing_time'.tr);
                     } else if (!storeController.isStoreVeg &&
                         !storeController.isStoreNonVeg) {
                       showCustomSnackBar('select_at_least_one_item_type'.tr);
-                    } else if (_module.orderPlaceToScheduleInterval &&
+                    } else if ((_module.orderPlaceToScheduleInterval ??
+                            false) &&
                         _processingTime.isEmpty) {
                       showCustomSnackBar('enter_minimum_processing_time'.tr);
                     } else if (storeController.isGstEnabled &&
@@ -516,19 +529,20 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                       _store.minimumOrder = double.parse(_minimumOrder);
                       _store.gstStatus = storeController.isGstEnabled;
                       _store.gstCode = _gstCode;
-                      _store.orderPlaceToScheduleInterval = _module
-                              .orderPlaceToScheduleInterval
-                          ? double.parse(_processingTimeController.text).toInt()
-                          : 0;
+                      _store.orderPlaceToScheduleInterval =
+                          (_module.orderPlaceToScheduleInterval ?? false)
+                              ? double.parse(_processingTimeController.text)
+                                  .toInt()
+                              : 0;
                       _store.deliveryCharge = double.parse(_deliveryFee);
-                      _store.veg =
-                          (_module.vegNonVeg && storeController.isStoreVeg)
-                              ? 1
-                              : 0;
-                      _store.nonVeg =
-                          (!_module.vegNonVeg || storeController.isStoreNonVeg)
-                              ? 1
-                              : 0;
+                      _store.veg = ((_module.vegNonVeg ?? false) &&
+                              storeController.isStoreVeg)
+                          ? 1
+                          : 0;
+                      _store.nonVeg = (!(_module.vegNonVeg ?? false) ||
+                              storeController.isStoreNonVeg)
+                          ? 1
+                          : 0;
                       storeController.updateStore(
                         _store,
                         _minimum,

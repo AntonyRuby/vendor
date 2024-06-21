@@ -22,8 +22,12 @@ class MenuScreen extends StatelessWidget {
         icon: Images.add_food,
         title: 'add_item'.tr,
         route: RouteHelper.getItemRoute(null),
-        isBlocked:
-            !Get.find<AuthController>().profileModel.stores[0].itemSection,
+        isBlocked: !(Get.find<AuthController>()
+                .profileModel
+                .stores
+                ?.first
+                .itemSection ??
+            false),
       ),
       MenuModel(
           icon: Images.campaign,
@@ -51,7 +55,11 @@ class MenuScreen extends StatelessWidget {
           route: RouteHelper.getTermsRoute()),
       MenuModel(icon: Images.log_out, title: 'logout'.tr, route: ''),
     ];
-    if (Get.find<AuthController>().profileModel.stores[0].selfDeliverySystem ==
+    if (Get.find<AuthController>()
+            .profileModel
+            .stores
+            ?.first
+            .selfDeliverySystem ==
         1) {
       _menuList.insert(
           5,
@@ -60,7 +68,8 @@ class MenuScreen extends StatelessWidget {
               title: 'delivery_man'.tr,
               route: RouteHelper.getDeliveryManRoute()));
     }
-    if (Get.find<SplashController>().configModel.moduleConfig.module.addOn) {
+    if (Get.find<SplashController>().configModel.moduleConfig?.module?.addOn ??
+        false) {
       _menuList.insert(
           6,
           MenuModel(

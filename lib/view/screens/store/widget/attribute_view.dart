@@ -21,8 +21,12 @@ class AttributeView extends StatefulWidget {
 class _AttributeViewState extends State<AttributeView> {
   @override
   Widget build(BuildContext context) {
-    bool _stock =
-        Get.find<SplashController>().configModel.moduleConfig.module.stock;
+    bool _stock = (Get.find<SplashController>()
+            .configModel
+            .moduleConfig
+            ?.module
+            ?.stock) ??
+        false;
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(
@@ -48,7 +52,8 @@ class _AttributeViewState extends State<AttributeView> {
                 padding: EdgeInsets.symmetric(
                     horizontal: Dimensions.PADDING_SIZE_EXTRA_SMALL),
                 decoration: BoxDecoration(
-                  color: widget.storeController.attributeList[index].active
+                  color: (widget.storeController.attributeList[index].active ??
+                          false)
                       ? Theme.of(context).primaryColor
                       : Theme.of(context).cardColor,
                   border: Border.all(
@@ -56,13 +61,16 @@ class _AttributeViewState extends State<AttributeView> {
                   borderRadius: BorderRadius.circular(Dimensions.RADIUS_SMALL),
                 ),
                 child: Text(
-                  widget.storeController.attributeList[index].attribute.name,
+                  widget.storeController.attributeList[index].attribute.name ??
+                      '',
                   maxLines: 2,
                   textAlign: TextAlign.center,
                   style: robotoRegular.copyWith(
-                    color: widget.storeController.attributeList[index].active
-                        ? Theme.of(context).cardColor
-                        : Theme.of(context).disabledColor,
+                    color:
+                        (widget.storeController.attributeList[index].active ??
+                                false)
+                            ? Theme.of(context).cardColor
+                            : Theme.of(context).disabledColor,
                   ),
                 ),
               ),
@@ -72,7 +80,7 @@ class _AttributeViewState extends State<AttributeView> {
       ),
       SizedBox(
           height: widget.storeController.attributeList
-                      .where((element) => element.active)
+                      .where((element) => element.active ?? false)
                       .length >
                   0
               ? Dimensions.PADDING_SIZE_LARGE
@@ -83,7 +91,7 @@ class _AttributeViewState extends State<AttributeView> {
         padding: EdgeInsets.zero,
         itemCount: widget.storeController.attributeList.length,
         itemBuilder: (context, index) {
-          return widget.storeController.attributeList[index].active
+          return (widget.storeController.attributeList[index].active ?? false)
               ? Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Row(children: [
                     Container(
@@ -96,7 +104,8 @@ class _AttributeViewState extends State<AttributeView> {
                         color: Theme.of(context).cardColor,
                         boxShadow: [
                           BoxShadow(
-                              color: Colors.grey[Get.isDarkMode ? 700 : 300],
+                              color: Colors.grey[Get.isDarkMode ? 700 : 300] ??
+                                  Colors.red,
                               blurRadius: 5,
                               spreadRadius: 1)
                         ],
@@ -104,12 +113,14 @@ class _AttributeViewState extends State<AttributeView> {
                             BorderRadius.circular(Dimensions.RADIUS_SMALL),
                       ),
                       child: Text(
-                        widget.storeController.attributeList[index].attribute
-                            .name,
+                        widget
+                            .storeController.attributeList[index].attribute.name
+                            .toString(),
                         maxLines: 2,
                         textAlign: TextAlign.center,
                         style: robotoRegular.copyWith(
-                            color: Theme.of(context).textTheme.bodyText1.color),
+                          color: Theme.of(context).textTheme.bodyLarge?.color,
+                        ),
                       ),
                     ),
                     SizedBox(width: Dimensions.PADDING_SIZE_LARGE),
@@ -210,7 +221,8 @@ class _AttributeViewState extends State<AttributeView> {
               borderRadius: BorderRadius.circular(Dimensions.RADIUS_SMALL),
               boxShadow: [
                 BoxShadow(
-                    color: Colors.grey[Get.isDarkMode ? 700 : 300],
+                    color:
+                        Colors.grey[Get.isDarkMode ? 700 : 300] ?? Colors.red,
                     blurRadius: 5,
                     spreadRadius: 1)
               ],
@@ -225,7 +237,8 @@ class _AttributeViewState extends State<AttributeView> {
                 ),
                 SizedBox(width: Dimensions.PADDING_SIZE_SMALL),
                 Text(
-                  widget.storeController.variantTypeList[index].variantType,
+                  widget.storeController.variantTypeList[index].variantType ??
+                      '',
                   style: robotoRegular,
                   textAlign: TextAlign.center,
                   maxLines: 1,

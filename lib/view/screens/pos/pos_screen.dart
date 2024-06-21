@@ -33,7 +33,7 @@ class _PosScreenState extends State<PosScreen> {
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios),
-          color: Theme.of(context).textTheme.bodyText1.color,
+          color: Theme.of(context).textTheme.bodyLarge?.color,
           onPressed: () => Get.back(),
         ),
         title: TypeAheadField(
@@ -56,7 +56,7 @@ class _PosScreenState extends State<PosScreen> {
               fillColor: Theme.of(context).cardColor,
             ),
             style: robotoRegular.copyWith(
-              color: Theme.of(context).textTheme.bodyText1.color,
+              color: Theme.of(context).textTheme.bodyLarge?.color,
               fontSize: Dimensions.FONT_SIZE_LARGE,
             ),
           ),
@@ -71,7 +71,7 @@ class _PosScreenState extends State<PosScreen> {
                   borderRadius: BorderRadius.circular(Dimensions.RADIUS_SMALL),
                   child: CustomImage(
                     image:
-                        '${Get.find<SplashController>().configModel.baseUrls.itemImageUrl}/${suggestion.image}',
+                        '${Get.find<SplashController>().configModel.baseUrls?.itemImageUrl}/${suggestion.image}',
                     height: 40,
                     width: 40,
                     fit: BoxFit.cover,
@@ -82,18 +82,18 @@ class _PosScreenState extends State<PosScreen> {
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(suggestion.name,
+                        Text(suggestion.name.toString(),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: robotoRegular.copyWith(
                               color:
-                                  Theme.of(context).textTheme.bodyText1.color,
+                                  Theme.of(context).textTheme.bodyLarge?.color,
                               fontSize: Dimensions.FONT_SIZE_LARGE,
                             )),
                         Text(PriceConverter.convertPrice(suggestion.price),
                             style: robotoRegular.copyWith(
                               color:
-                                  Theme.of(context).textTheme.bodyText1.color,
+                                  Theme.of(context).textTheme.bodyLarge?.color,
                               fontSize: Dimensions.FONT_SIZE_SMALL,
                             )),
                       ]),
@@ -113,7 +113,7 @@ class _PosScreenState extends State<PosScreen> {
             onPressed: () {},
             icon: Icon(
               Icons.search,
-              color: Theme.of(context).textTheme.bodyText1.color,
+              color: Theme.of(context).textTheme.bodyLarge?.color,
             ),
           ),
         ],
@@ -127,66 +127,71 @@ class _PosScreenState extends State<PosScreen> {
           double _discount = 0;
           double _tax = 0;
           double _orderAmount = 0;
-          Store _store = Get.find<AuthController>().profileModel != null
-              ? Get.find<AuthController>().profileModel.stores[0]
+          Store? _store = Get.find<AuthController>().profileModel != null
+              ? Get.find<AuthController>().profileModel.stores?.first
               : null;
 
-          if (_store != null) {
-            posController.cartList.forEach((cartModel) {
-              List<AddOns> _addOnList = [];
-              cartModel.addOnIds.forEach((addOnId) {
-                for (AddOns addOns in cartModel.item.addOns) {
-                  if (addOns.id == addOnId.id) {
-                    _addOnList.add(addOns);
-                    break;
-                  }
+          posController.cartList.forEach((cartModel) {
+            List<AddOns> _addOnList = [];
+            cartModel.addOnIds?.forEach((addOnId) {
+              for (AddOns addOns in cartModel.item?.addOns ?? []) {
+                if (addOns.id == addOnId.id) {
+                  _addOnList.add(addOns);
+                  break;
                 }
-              });
-              _addOnsList.add(_addOnList);
-
-              _availableList.add(DateConverter.isAvailable(
-                  cartModel.item.availableTimeStarts,
-                  cartModel.item.availableTimeEnds));
-
-              for (int index = 0; index < _addOnList.length; index++) {
-                _addOns = _addOns +
-                    (_addOnList[index].price *
-                        cartModel.addOnIds[index].quantity);
               }
-              _itemPrice = _itemPrice + (cartModel.price * cartModel.quantity);
-              double _dis = (_store.discount != null &&
-                      DateConverter.isAvailable(
-                          _store.discount.startTime, _store.discount.endTime,
-                          isoTime: true))
-                  ? _store.discount.discount
-                  : cartModel.item.discount;
-              String _disType = (_store.discount != null &&
-                      DateConverter.isAvailable(
-                          _store.discount.startTime, _store.discount.endTime,
-                          isoTime: true))
-                  ? 'percent'
-                  : cartModel.item.discountType;
-              _discount = _discount +
-                  ((cartModel.price -
-                          PriceConverter.convertWithDiscount(
-                              cartModel.price, _dis, _disType)) *
-                      cartModel.quantity);
             });
+            _addOnsList.add(_addOnList);
 
-            if (_store.discount != null) {
-              if (_store.discount.maxDiscount != 0 &&
-                  _store.discount.maxDiscount < _discount) {
-                _discount = _store.discount.maxDiscount;
-              }
-              if (_store.discount.minPurchase != 0 &&
-                  _store.discount.minPurchase > (_itemPrice + _addOns)) {
-                _discount = 0;
-              }
+            _availableList.add(DateConverter.isAvailable(
+              cartModel.item?.availableTimeStarts ?? '',
+              cartModel.item?.availableTimeEnds ?? '',
+            ));
+
+            for (int index = 0; index < _addOnList.length; index++) {
+              _addOns = _addOns +
+                  ((_addOnList[index].price ?? 0) *
+                      (cartModel.addOnIds?[index].quantity ?? 0));
             }
-            _orderAmount = (_itemPrice - _discount) + _addOns;
-            _tax = PriceConverter.calculation(
-                _orderAmount, _store.tax, 'percent', 1);
+            _itemPrice = _itemPrice +
+                ((cartModel.price ?? 0) * (cartModel.quantity ?? 0));
+            double _dis = ((_store?.discount != null &&
+                        DateConverter.isAvailable(
+                          _store?.discount?.startTime ?? '',
+                          _store?.discount?.endTime ?? '',
+                          isoTime: true,
+                        ))
+                    ? _store?.discount?.discount
+                    : cartModel.item?.discount) ??
+                0;
+            String _disType = ((_store?.discount != null &&
+                        DateConverter.isAvailable(
+                            _store?.discount?.startTime ?? '',
+                            _store?.discount?.endTime ?? '',
+                            isoTime: true))
+                    ? 'percent'
+                    : cartModel.item?.discountType) ??
+                '';
+            _discount = _discount +
+                (((cartModel.price ?? 0) -
+                        PriceConverter.convertWithDiscount(
+                            (cartModel.price ?? 0), _dis, _disType)) *
+                    (cartModel.quantity ?? 0));
+          });
+
+          if (_store?.discount != null) {
+            if ((_store?.discount?.maxDiscount ?? 0) != 0 &&
+                (_store?.discount?.maxDiscount ?? 0) < _discount) {
+              _discount = (_store?.discount?.maxDiscount ?? 0);
+            }
+            if ((_store?.discount?.minPurchase ?? 0) != 0 &&
+                (_store?.discount?.minPurchase ?? 0) > (_itemPrice + _addOns)) {
+              _discount = 0;
+            }
           }
+          _orderAmount = (_itemPrice - _discount) + _addOns;
+          _tax = PriceConverter.calculation(
+              _orderAmount, _store?.tax ?? 0, 'percent', 1);
 
           double _subTotal = _itemPrice + _addOns;
           double _total = _subTotal - _discount + _tax;

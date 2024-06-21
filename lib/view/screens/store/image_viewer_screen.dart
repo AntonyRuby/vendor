@@ -15,8 +15,8 @@ class ImageViewerScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     Get.find<StoreController>().setImageIndex(0, false);
     List<String> _imageList = [];
-    _imageList.add(item.image);
-    _imageList.addAll(item.images);
+    _imageList.add(item.image ?? '');
+    // _imageList.addAll(item.images ?? '');
     final PageController _pageController = PageController();
 
     return Scaffold(
@@ -34,7 +34,7 @@ class ImageViewerScreen extends StatelessWidget {
               builder: (BuildContext context, int index) {
                 return PhotoViewGalleryPageOptions(
                   imageProvider: NetworkImage(
-                      '${Get.find<SplashController>().configModel.baseUrls.itemImageUrl}/${_imageList[index]}'),
+                      '${Get.find<SplashController>().configModel.baseUrls?.itemImageUrl}/${_imageList[index]}'),
                   initialScale: PhotoViewComputedScale.contained,
                   heroAttributes:
                       PhotoViewHeroAttributes(tag: index.toString()),
@@ -48,7 +48,7 @@ class ImageViewerScreen extends StatelessWidget {
                         value: event == null
                             ? 0
                             : event.cumulativeBytesLoaded /
-                                event.expectedTotalBytes,
+                                (event.expectedTotalBytes ?? 0),
                       ))),
               onPageChanged: (int index) =>
                   storeController.setImageIndex(index, true),

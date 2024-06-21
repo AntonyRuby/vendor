@@ -44,13 +44,13 @@ class _HtmlViewerScreenState extends State<HtmlViewerScreen> {
                     key: Key(widget.isPrivacyPolicy
                         ? 'privacy_policy'
                         : 'terms_condition'),
-                    onLinkTap: (String url, RenderContext context,
+                    onLinkTap: (String? url, RenderContext context,
                         Map<String, String> attributes, element) {
-                      if (url.startsWith('www.')) {
-                        url = 'https://' + url;
+                      if ((url ?? '').startsWith('www.')) {
+                        url = 'https://' + url!;
                       }
                       print('Redirect to url: $url');
-                      launchUrlString(url,
+                      launchUrlString((url ?? ''),
                           mode: LaunchMode.externalApplication);
                     },
                   ),

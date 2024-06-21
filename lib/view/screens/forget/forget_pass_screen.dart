@@ -66,10 +66,10 @@ class _ForgetPassScreenState extends State<ForgetPassScreen> {
       showCustomSnackBar('enter_a_valid_email_address'.tr);
     } else {
       Get.find<AuthController>().forgetPassword(_email).then((status) async {
-        if (status.isSuccess) {
+        if (status.isSuccess ?? false) {
           Get.toNamed(RouteHelper.getVerificationRoute(_email));
         } else {
-          showCustomSnackBar(status.message);
+          showCustomSnackBar(status.message ?? '');
         }
       });
     }

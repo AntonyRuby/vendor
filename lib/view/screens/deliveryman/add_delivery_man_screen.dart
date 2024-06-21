@@ -39,29 +39,29 @@ class _AddDeliveryManScreenState extends State<AddDeliveryManScreen> {
   final FocusNode _phoneNode = FocusNode();
   final FocusNode _passwordNode = FocusNode();
   final FocusNode _identityNumberNode = FocusNode();
-  bool _update;
-  DeliveryManModel _deliveryMan;
-  String _countryDialCode;
+  bool _update = false;
+  DeliveryManModel _deliveryMan = DeliveryManModel();
+  String _countryDialCode = '';
 
   @override
   void initState() {
     super.initState();
 
-    _deliveryMan = widget.deliveryMan;
+    _deliveryMan = widget.deliveryMan ?? DeliveryManModel();
     _update = widget.deliveryMan != null;
     _countryDialCode = CountryCode.fromCountryCode(
-            Get.find<SplashController>().configModel.country)
-        .dialCode;
+            Get.find<SplashController>().configModel.country ?? '')
+        .dialCode!;
     Get.find<DeliveryManController>().pickImage(false, true);
     if (_update) {
-      _fNameController.text = _deliveryMan.fName;
-      _lNameController.text = _deliveryMan.lName;
-      _emailController.text = _deliveryMan.email;
-      _phoneController.text = _deliveryMan.phone;
-      _identityNumberController.text = _deliveryMan.identityNumber;
+      _fNameController.text = _deliveryMan.fName ?? '';
+      _lNameController.text = _deliveryMan.lName ?? '';
+      _emailController.text = _deliveryMan.email ?? '';
+      _phoneController.text = _deliveryMan.phone ?? '';
+      _identityNumberController.text = _deliveryMan.identityNumber ?? '';
       Get.find<DeliveryManController>()
-          .setIdentityTypeIndex(_deliveryMan.identityType, false);
-      _splitPhone(_deliveryMan.phone);
+          .setIdentityTypeIndex(_deliveryMan.identityType ?? '', false);
+      _splitPhone(_deliveryMan.phone ?? '');
     } else {
       _deliveryMan = DeliveryManModel();
       Get.find<DeliveryManController>().setIdentityTypeIndex(
@@ -123,7 +123,7 @@ class _AddDeliveryManScreenState extends State<AddDeliveryManScreen> {
                           BorderRadius.circular(Dimensions.RADIUS_SMALL),
                       child: dmController.pickedImage != null
                           ? Image.network(
-                              dmController.pickedImage.path,
+                              dmController.pickedImage?.path ?? '',
                               width: 150,
                               height: 120,
                               fit: BoxFit.cover,
@@ -131,7 +131,7 @@ class _AddDeliveryManScreenState extends State<AddDeliveryManScreen> {
                           : FadeInImage.assetNetwork(
                               placeholder: Images.placeholder,
                               image:
-                                  '${Get.find<SplashController>().configModel.baseUrls.deliveryManImageUrl}/${_deliveryMan.image != null ? _deliveryMan.image : ''}',
+                                  '${Get.find<SplashController>().configModel.baseUrls?.deliveryManImageUrl}/${_deliveryMan.image != null ? _deliveryMan.image : ''}',
                               height: 120,
                               width: 150,
                               fit: BoxFit.cover,
@@ -210,7 +210,8 @@ class _AddDeliveryManScreenState extends State<AddDeliveryManScreen> {
                         BorderRadius.circular(Dimensions.RADIUS_SMALL),
                     boxShadow: [
                       BoxShadow(
-                          color: Colors.grey[Get.isDarkMode ? 800 : 200],
+                          color: Colors.grey[Get.isDarkMode ? 800 : 200] ??
+                              Colors.red,
                           spreadRadius: 1,
                           blurRadius: 5,
                           offset: Offset(0, 5))
@@ -218,7 +219,7 @@ class _AddDeliveryManScreenState extends State<AddDeliveryManScreen> {
                   ),
                   child: CodePickerWidget(
                     onChanged: (CountryCode countryCode) {
-                      _countryDialCode = countryCode.dialCode;
+                      _countryDialCode = countryCode.dialCode ?? '';
                     },
                     initialSelection: _countryDialCode,
                     favorite: [_countryDialCode],
@@ -228,7 +229,8 @@ class _AddDeliveryManScreenState extends State<AddDeliveryManScreen> {
                     flagWidth: 30,
                     textStyle: robotoRegular.copyWith(
                       fontSize: Dimensions.FONT_SIZE_LARGE,
-                      color: Theme.of(context).textTheme.bodyLarge.color,
+                      color: Theme.of(context).textTheme.bodyLarge?.color ??
+                          Colors.red,
                     ),
                   ),
                 ),
@@ -275,7 +277,9 @@ class _AddDeliveryManScreenState extends State<AddDeliveryManScreen> {
                               BorderRadius.circular(Dimensions.RADIUS_SMALL),
                           boxShadow: [
                             BoxShadow(
-                                color: Colors.grey[Get.isDarkMode ? 800 : 200],
+                                color:
+                                    Colors.grey[Get.isDarkMode ? 800 : 200] ??
+                                        Colors.red,
                                 spreadRadius: 2,
                                 blurRadius: 5,
                                 offset: Offset(0, 5))
@@ -292,7 +296,8 @@ class _AddDeliveryManScreenState extends State<AddDeliveryManScreen> {
                             );
                           }).toList(),
                           onChanged: (value) {
-                            dmController.setIdentityTypeIndex(value, true);
+                            dmController.setIdentityTypeIndex(
+                                value ?? '', true);
                           },
                           isExpanded: true,
                           underline: SizedBox(),
@@ -335,7 +340,8 @@ class _AddDeliveryManScreenState extends State<AddDeliveryManScreen> {
                             child: ListView.builder(
                               scrollDirection: Axis.horizontal,
                               physics: BouncingScrollPhysics(),
-                              itemCount: _deliveryMan.identityImage.length,
+                              itemCount:
+                                  (_deliveryMan.identityImage?.length) ?? 0,
                               itemBuilder: (context, index) {
                                 return Container(
                                   margin: EdgeInsets.only(
@@ -352,7 +358,7 @@ class _AddDeliveryManScreenState extends State<AddDeliveryManScreen> {
                                         Dimensions.RADIUS_SMALL),
                                     child: CustomImage(
                                       image:
-                                          '${Get.find<SplashController>().configModel.baseUrls.deliveryManImageUrl}/${_deliveryMan.identityImage[index]}',
+                                          '${Get.find<SplashController>().configModel.baseUrls?.deliveryManImageUrl}/${_deliveryMan.identityImage?[index]}',
                                       width: 150,
                                       height: 120,
                                       fit: BoxFit.cover,
@@ -379,7 +385,7 @@ class _AddDeliveryManScreenState extends State<AddDeliveryManScreen> {
                   physics: BouncingScrollPhysics(),
                   itemCount: dmController.pickedIdentities.length + 1,
                   itemBuilder: (context, index) {
-                    XFile _file = index == dmController.pickedIdentities.length
+                    XFile? _file = index == dmController.pickedIdentities.length
                         ? null
                         : dmController.pickedIdentities[index];
                     if (index == dmController.pickedIdentities.length) {
@@ -431,7 +437,7 @@ class _AddDeliveryManScreenState extends State<AddDeliveryManScreen> {
                           borderRadius:
                               BorderRadius.circular(Dimensions.RADIUS_SMALL),
                           child: Image.network(
-                            _file.path,
+                            _file?.path ?? '',
                             width: 150,
                             height: 120,
                             fit: BoxFit.cover,

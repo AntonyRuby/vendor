@@ -17,8 +17,8 @@ class DailyTimeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String _openingTime;
-    String _closingTime;
+    String _openingTime = '';
+    String _closingTime = '';
     List<Schedules> _scheduleList = [];
     Get.find<StoreController>().scheduleList.forEach((schedule) {
       if (schedule.day == weekDay) {
@@ -124,8 +124,8 @@ class DailyTimeWidget extends StatelessWidget {
                                                     style: robotoBold.copyWith(
                                                         color: Theme.of(context)
                                                             .textTheme
-                                                            .bodyText1
-                                                            .color),
+                                                            .bodyLarge
+                                                            ?.color),
                                                   ),
                                                 )),
                                                 SizedBox(
@@ -136,49 +136,52 @@ class DailyTimeWidget extends StatelessWidget {
                                                   buttonText: 'add'.tr,
                                                   onPressed: () {
                                                     bool _overlapped = false;
-                                                    if (_openingTime != null &&
-                                                        _closingTime != null) {
-                                                      for (int index = 0;
-                                                          index <
-                                                              _scheduleList
-                                                                  .length;
-                                                          index++) {
-                                                        if (_isUnderTime(_scheduleList[index].openingTime, _openingTime, _closingTime) ||
-                                                            _isUnderTime(
-                                                                _scheduleList[
-                                                                        index]
-                                                                    .closingTime,
-                                                                _openingTime,
-                                                                _closingTime) ||
-                                                            _isUnderTime(
-                                                                _openingTime,
-                                                                _scheduleList[
-                                                                        index]
-                                                                    .openingTime,
-                                                                _scheduleList[
-                                                                        index]
-                                                                    .closingTime) ||
-                                                            _isUnderTime(
-                                                                _closingTime,
-                                                                _scheduleList[
-                                                                        index]
-                                                                    .openingTime,
-                                                                _scheduleList[
-                                                                        index]
-                                                                    .closingTime)) {
-                                                          _overlapped = true;
-                                                          break;
-                                                        }
+                                                    for (int index = 0;
+                                                        index <
+                                                            _scheduleList
+                                                                .length;
+                                                        index++) {
+                                                      if (_isUnderTime(
+                                                              _scheduleList[
+                                                                          index]
+                                                                      .openingTime ??
+                                                                  '',
+                                                              _openingTime,
+                                                              _closingTime) ||
+                                                          _isUnderTime(
+                                                              _scheduleList[
+                                                                      index]
+                                                                  .closingTime
+                                                                  .toString(),
+                                                              _openingTime
+                                                                  .toString(),
+                                                              _closingTime
+                                                                  .toString()) ||
+                                                          _isUnderTime(
+                                                              _openingTime,
+                                                              _scheduleList[
+                                                                      index]
+                                                                  .openingTime
+                                                                  .toString(),
+                                                              _scheduleList[
+                                                                      index]
+                                                                  .closingTime
+                                                                  .toString()) ||
+                                                          _isUnderTime(
+                                                              _closingTime,
+                                                              _scheduleList[
+                                                                      index]
+                                                                  .openingTime
+                                                                  .toString(),
+                                                              _scheduleList[
+                                                                      index]
+                                                                  .closingTime
+                                                                  .toString())) {
+                                                        _overlapped = true;
+                                                        break;
                                                       }
                                                     }
-                                                    if (_openingTime == null) {
-                                                      showCustomSnackBar(
-                                                          'pick_start_time'.tr);
-                                                    } else if (_closingTime ==
-                                                        null) {
-                                                      showCustomSnackBar(
-                                                          'pick_end_time'.tr);
-                                                    } else if (DateConverter
+                                                    if (DateConverter
                                                             .convertTimeToDateTime(
                                                                 _openingTime)
                                                         .isAfter(DateConverter
@@ -230,8 +233,11 @@ class DailyTimeWidget extends StatelessWidget {
                       child: Container(
                         decoration: BoxDecoration(
                           border: Border.all(
-                              color:
-                                  Theme.of(context).textTheme.bodyText1.color,
+                              color: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge
+                                      ?.color ??
+                                  Colors.red,
                               width: 1),
                           color: Theme.of(context).cardColor,
                           borderRadius:
@@ -241,8 +247,8 @@ class DailyTimeWidget extends StatelessWidget {
                             horizontal: Dimensions.PADDING_SIZE_EXTRA_SMALL),
                         child: Row(children: [
                           Text(
-                            '${DateConverter.convertStringTimeToTime(_scheduleList[index].openingTime.substring(0, 5))} '
-                            '- ${DateConverter.convertStringTimeToTime(_scheduleList[index].closingTime.substring(0, 5))}',
+                            '${DateConverter.convertStringTimeToTime((_scheduleList[index].openingTime).toString().substring(0, 5))} '
+                            '- ${DateConverter.convertStringTimeToTime(_scheduleList[index].closingTime.toString().substring(0, 5))}',
                           ),
                           SizedBox(width: Dimensions.PADDING_SIZE_EXTRA_SMALL),
                           InkWell(
@@ -254,7 +260,7 @@ class DailyTimeWidget extends StatelessWidget {
                                   onYesPressed: () =>
                                       Get.find<StoreController>()
                                           .deleteSchedule(
-                                              _scheduleList[index].id),
+                                              _scheduleList[index].id ?? 0),
                                 ),
                                 barrierDismissible: false),
                             child: Icon(Icons.cancel, color: Colors.red),

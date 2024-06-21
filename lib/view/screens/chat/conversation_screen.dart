@@ -107,35 +107,44 @@ class _ConversationScreenState extends State<ConversationScreen> {
                                               itemBuilder: (context, index) {
                                                 Conversation conversation =
                                                     _conversation
-                                                        .conversations[index];
+                                                                .conversations?[
+                                                            index] ??
+                                                        Conversation();
 
                                                 User _user;
                                                 String _type;
                                                 if (conversation.senderType ==
                                                     UserType.vendor.name) {
-                                                  _user = conversation.receiver;
-                                                  _type =
-                                                      conversation.receiverType;
+                                                  _user =
+                                                      conversation.receiver ??
+                                                          User();
+                                                  _type = conversation
+                                                          .receiverType ??
+                                                      '';
                                                 } else {
-                                                  _user = conversation.sender;
+                                                  _user = conversation.sender ??
+                                                      User();
                                                   _type =
-                                                      conversation.senderType;
+                                                      conversation.senderType ??
+                                                          '';
                                                 }
 
                                                 String _baseUrl = '';
                                                 if (_type ==
                                                     UserType.customer.name) {
                                                   _baseUrl = Get.find<
-                                                          SplashController>()
-                                                      .configModel
-                                                      .baseUrls
-                                                      .customerImageUrl;
+                                                              SplashController>()
+                                                          .configModel
+                                                          .baseUrls
+                                                          ?.customerImageUrl ??
+                                                      '';
                                                 } else {
                                                   _baseUrl = Get.find<
-                                                          SplashController>()
-                                                      .configModel
-                                                      .baseUrls
-                                                      .deliveryManImageUrl;
+                                                              SplashController>()
+                                                          .configModel
+                                                          .baseUrls
+                                                          ?.deliveryManImageUrl ??
+                                                      '';
                                                 }
 
                                                 print(
@@ -155,9 +164,10 @@ class _ConversationScreenState extends State<ConversationScreen> {
                                                     boxShadow: [
                                                       BoxShadow(
                                                           color: Colors.grey[
-                                                              Get.isDarkMode
-                                                                  ? 800
-                                                                  : 200],
+                                                                  Get.isDarkMode
+                                                                      ? 800
+                                                                      : 200] ??
+                                                              Colors.red,
                                                           spreadRadius: 1,
                                                           blurRadius: 5)
                                                     ],
@@ -187,8 +197,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
                                                               : null,
                                                         ),
                                                         conversationId:
-                                                            conversation.id,
-                                                      )).then((value) => Get.find<
+                                                            conversation.id ??
+                                                                0,
+                                                      ))?.then((value) => Get.find<
                                                               ChatController>()
                                                           .getConversationList(
                                                               1));
@@ -264,8 +275,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
                                                               child: Text(
                                                                 DateConverter.localDateToIsoStringAMPM(
                                                                     DateConverter.dateTimeStringToDate(
-                                                                        conversation
-                                                                            .lastMessageTime)),
+                                                                        conversation.lastMessageTime ??
+                                                                            '')),
                                                                 style: robotoRegular.copyWith(
                                                                     color: Theme.of(
                                                                             context)
@@ -276,8 +287,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
                                                               ),
                                                             )
                                                           : SizedBox(),
-                                                      (conversation
-                                                                  .unreadMessageCount >
+                                                      ((conversation.unreadMessageCount ??
+                                                                  0) >
                                                               0)
                                                           ? Positioned(
                                                               right: 5,
@@ -288,7 +299,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                                                                           .all(
                                                                     conversation.lastMessage !=
                                                                             null
-                                                                        ? (conversation.lastMessage.senderId ==
+                                                                        ? ((conversation.lastMessage?.senderId ?? 0) ==
                                                                                 _user.id)
                                                                             ? Dimensions.PADDING_SIZE_EXTRA_SMALL
                                                                             : 0.0
@@ -303,7 +314,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                                                                   child: Text(
                                                                     conversation.lastMessage !=
                                                                             null
-                                                                        ? (conversation.lastMessage.senderId ==
+                                                                        ? ((conversation.lastMessage?.senderId ?? 0) ==
                                                                                 _user
                                                                                     .id)
                                                                             ? conversation.unreadMessageCount

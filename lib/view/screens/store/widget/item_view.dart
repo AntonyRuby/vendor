@@ -9,16 +9,19 @@ import 'package:get/get.dart';
 class ItemView extends StatelessWidget {
   final ScrollController scrollController;
   final String type;
-  final Function(String type) onVegFilterTap;
-  ItemView({required this.scrollController, this.type, this.onVegFilterTap});
+  final Function(String type)? onVegFilterTap;
+  ItemView({
+    required this.scrollController,
+    this.type = '',
+    this.onVegFilterTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     Get.find<StoreController>().setOffset(1);
-    scrollController?.addListener(() {
+    scrollController.addListener(() {
       if (scrollController.position.pixels ==
               scrollController.position.maxScrollExtent &&
-          Get.find<StoreController>().itemList != null &&
           !Get.find<StoreController>().isLoading) {
         int pageSize = (Get.find<StoreController>().pageSize / 10).ceil();
         if (Get.find<StoreController>().offset < pageSize) {
